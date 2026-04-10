@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM-MA Warranty Notification System</title>
+  <meta name="description" content="ระบบแจ้งเตือนสัญญา MA/PM - จัดการและติดตามสัญญาประกันทั้งหมด">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M12 22V12" stroke="currentColor" stroke-width="2"/>
+            <path d="M22 7L12 12L2 7" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <span class="logo-text">PM-MA Notify</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>แดชบอร์ด</span>
+      </a>
+      <a href="#" class="nav-item" data-page="contracts" id="nav-contracts">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>สัญญาทั้งหมด</span>
+      </a>
+      <a href="#" class="nav-item" data-page="add-contract" id="nav-add">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span>เพิ่มสัญญาใหม่</span>
+      </a>
+      <a href="#" class="nav-item" data-page="logs" id="nav-logs">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>ประวัติแจ้งเตือน</span>
+      </a>
+      <a href="#" class="nav-item" data-page="settings" id="nav-settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>ตั้งค่า</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">S</div>
+        <div class="user-details">
+          <span class="user-name">Sale Admin</span>
+          <span class="user-role">sale@company.com</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header" id="mobileHeader">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="mobile-title">PM-MA Notify</span>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ========== DASHBOARD PAGE ========== -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 id="heading-dashboard">แดชบอร์ดสัญญา MA/PM</h1>
+          <p class="page-subtitle">ภาพรวมสถานะสัญญาทั้งหมดของคุณ</p>
+        </div>
+        <div class="header-actions">
+          <span class="date-badge" id="currentDate"></span>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card stat-critical" id="stat-critical">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value" id="criticalCount">2</span>
+            <span class="stat-label">ใกล้หมดอายุ (&lt; 30 วัน)</span>
+          </div>
+          <div class="stat-indicator critical"></div>
+        </div>
+        <div class="stat-card stat-warning" id="stat-warning">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value" id="warningCount">5</span>
+            <span class="stat-label">ปานกลาง (30-90 วัน)</span>
+          </div>
+          <div class="stat-indicator warning"></div>
+        </div>
+        <div class="stat-card stat-safe" id="stat-safe">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value" id="safeCount">10</span>
+            <span class="stat-label">ปกติ (&gt; 90 วัน)</span>
+          </div>
+          <div class="stat-indicator safe"></div>
+        </div>
+        <div class="stat-card stat-total" id="stat-total">
+          <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value" id="totalCount">17</span>
+            <span class="stat-label">สัญญาทั้งหมด</span>
+          </div>
+          <div class="stat-indicator total"></div>
+        </div>
+      </div>
+
+      <!-- Recent Contracts Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2>📋 สัญญาที่ใกล้หมดอายุ</h2>
+          <button class="btn btn-outline btn-sm" id="btnViewAll">ดูทั้งหมด</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="dashboardTable">
+            <thead>
+              <tr>
+                <th>PO Number</th>
+                <th>โครงการ</th>
+                <th>ลูกค้า</th>
+                <th>ประเภท</th>
+                <th>หมดอายุ</th>
+                <th>เหลือ</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Notifications -->
+      <div class="card">
+        <div class="card-header">
+          <h2>🔔 การแจ้งเตือนล่าสุด</h2>
+        </div>
+        <div class="notification-feed" id="notificationFeed">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CONTRACTS LIST PAGE ========== -->
+    <section class="page" id="page-contracts">
+      <div class="page-header">
+        <div>
+          <h1 id="heading-contracts">📄 สัญญาทั้งหมด</h1>
+          <p class="page-subtitle">จัดการและติดตามสัญญาประกัน MA/PM</p>
+        </div>
+        <div class="header-actions">
+          <div class="search-box" id="searchBox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="ค้นหาสัญญา..." id="searchInput">
+          </div>
+          <button class="btn btn-primary" id="btnAddNew">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            เพิ่มสัญญาใหม่
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all" id="filter-all">ทั้งหมด</button>
+        <button class="filter-tab" data-filter="critical" id="filter-critical">🔴 ใกล้หมดอายุ</button>
+        <button class="filter-tab" data-filter="warning" id="filter-warning">🟡 ปานกลาง</button>
+        <button class="filter-tab" data-filter="safe" id="filter-safe">🟢 ปกติ</button>
+        <button class="filter-tab" data-filter="expired" id="filter-expired">⚫ หมดอายุ</button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrapper">
+          <table class="data-table" id="contractsTable">
+            <thead>
+              <tr>
+                <th>Contract ID</th>
+                <th>PO Number</th>
+                <th>โครงการ</th>
+                <th>ลูกค้า</th>
+                <th>ประเภท</th>
+                <th>เริ่มต้น</th>
+                <th>หมดอายุ</th>
+                <th>เหลือ</th>
+                <th>สถานะ</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="contractsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ADD CONTRACT PAGE ========== -->
+    <section class="page" id="page-add-contract">
+      <div class="page-header">
+        <div>
+          <h1 id="heading-add-contract">🔔 เพิ่มสัญญา MA/PM ใหม่</h1>
+          <p class="page-subtitle">กรอกข้อมูลสัญญาและตั้งค่าการแจ้งเตือน</p>
+        </div>
+      </div>
+
+      <form class="contract-form" id="contractForm">
+        <!-- Section: Project Info -->
+        <div class="form-section">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            ข้อมูลโครงการ
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="poNumber">PO Number <span class="required">*</span></label>
+              <input type="text" id="poNumber" placeholder="PO-2026-0356" required>
+            </div>
+            <div class="form-group">
+              <label for="projectName">ชื่อโครงการ <span class="required">*</span></label>
+              <input type="text" id="projectName" placeholder="ระบบ CCTV โรงพยาบาลขอนแก่น" required>
+            </div>
+            <div class="form-group">
+              <label for="customerName">ชื่อลูกค้า <span class="required">*</span></label>
+              <input type="text" id="customerName" placeholder="โรงพยาบาลขอนแก่น" required>
+            </div>
+            <div class="form-group">
+              <label for="serviceType">ประเภทสัญญา <span class="required">*</span></label>
+              <select id="serviceType" required>
+                <option value="">— เลือกประเภท —</option>
+                <option value="MA">MA</option>
+                <option value="PM">PM</option>
+                <option value="MA+PM">MA+PM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Contract Period -->
+        <div class="form-section">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ระยะเวลาสัญญา
+          </div>
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label for="startDate">วันเริ่มต้น <span class="required">*</span></label>
+              <input type="date" id="startDate" required>
+            </div>
+            <div class="form-group">
+              <label for="endDate">วันหมดอายุ <span class="required">*</span></label>
+              <input type="date" id="endDate" required>
+            </div>
+          </div>
+          <div class="duration-preview" id="durationPreview">
+            <span>ระยะเวลาสัญญา: <strong id="durationText">— วัน</strong></span>
+          </div>
+        </div>
+
+        <!-- Section: Notification Settings -->
+        <div class="form-section">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            การแจ้งเตือน
+          </div>
+          <p class="form-hint">เลือกจำนวนวันก่อนหมดอายุที่ต้องการให้แจ้งเตือน</p>
+          <div class="checkbox-grid">
+            <label class="checkbox-card" for="alert90">
+              <input type="checkbox" id="alert90" value="90" checked>
+              <div class="checkbox-content">
+                <span class="checkbox-value">90</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
+            <label class="checkbox-card" for="alert60">
+              <input type="checkbox" id="alert60" value="60" checked>
+              <div class="checkbox-content">
+                <span class="checkbox-value">60</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
+            <label class="checkbox-card" for="alert30">
+              <input type="checkbox" id="alert30" value="30" checked>
+              <div class="checkbox-content">
+                <span class="checkbox-value">30</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
+            <label class="checkbox-card" for="alert7">
+              <input type="checkbox" id="alert7" value="7" checked>
+              <div class="checkbox-content">
+                <span class="checkbox-value">7</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section: Recipients -->
+        <div class="form-section">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            ผู้รับแจ้งเตือน
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="recipientsSale">Email Sale <span class="required">*</span></label>
+              <input type="email" id="recipientsSale" placeholder="sale@company.com" required>
+            </div>
+            <div class="form-group">
+              <label for="recipientsEng">Email Engineer <span class="required">*</span></label>
+              <input type="text" id="recipientsEng" placeholder="eng1@co.com, eng2@co.com" required>
+              <span class="form-hint">คั่นด้วยเครื่องหมาย , สำหรับหลาย email</span>
+            </div>
+            <div class="form-group form-group-full">
+              <label for="teamsWebhook">Teams Webhook URL <span class="required">*</span></label>
+              <input type="url" id="teamsWebhook" placeholder="https://outlook.office.com/webhook/..." required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Notes -->
+        <div class="form-section">
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+            หมายเหตุ
+          </div>
+          <div class="form-group">
+            <textarea id="contractNote" rows="3" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="btnCancel">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary btn-lg" id="btnSave">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            บันทึกสัญญา
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========== LOGS PAGE ========== -->
+    <section class="page" id="page-logs">
+      <div class="page-header">
+        <div>
+          <h1 id="heading-logs">📊 ประวัติการแจ้งเตือน</h1>
+          <p class="page-subtitle">ติดตามสถานะการส่งแจ้งเตือนทั้งหมด</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrapper">
+          <table class="data-table" id="logsTable">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Rule ID</th>
+                <th>Contract ID</th>
+                <th>ช่องทาง</th>
+                <th>สถานะ</th>
+                <th>ข้อผิดพลาด</th>
+                <th>เวลาส่ง</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SETTINGS PAGE ========== -->
+    <section class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <h1 id="heading-settings">⚙️ ตั้งค่าระบบ</h1>
+          <p class="page-subtitle">กำหนดค่า Azure, Email, และ Trigger</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2>🔐 Azure App Registration</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Tenant ID</label>
+              <input type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" id="settingTenantId">
+            </div>
+            <div class="form-group">
+              <label>Client ID</label>
+              <input type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" id="settingClientId">
+            </div>
+            <div class="form-group">
+              <label>Client Secret</label>
+              <input type="password" placeholder="••••••••••••••••" id="settingClientSecret">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>📧 Email Settings</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Sender Email</label>
+              <input type="email" placeholder="notification@company.com" id="settingSenderEmail">
+            </div>
+            <div class="info-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>ค่าเหล่านี้จะถูกเก็บใน Script Properties ของ Google Apps Script ไม่ควรใส่ในโค้ดโดยตรง</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>⏰ Scheduler Trigger</h2>
+          </div>
+          <div class="card-body">
+            <div class="trigger-status">
+              <div class="status-dot active"></div>
+              <span>Daily Trigger — ทุกวัน 08:00 น.</span>
+            </div>
+            <p class="form-hint">Trigger ถูกตั้งค่าผ่าน Google Apps Script<br>รัน <code>setupDailyTrigger()</code> เพื่อเปิดใช้งาน</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>📋 Setup Checklist</h2>
+          </div>
+          <div class="card-body">
+            <div class="checklist">
+              <label class="checklist-item">
+                <input type="checkbox" id="check1"> สร้าง Google Sheets + 3 Sheets
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check2"> สร้าง Apps Script (Code.gs, email.gs, teams.gs, utils.gs)
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check3"> ตั้งค่า Script Properties
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check4"> สร้าง Azure App Registration
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check5"> เพิ่ม MS Teams Webhook
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check6"> สร้าง AppSheet App
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check7"> รัน setupDailyTrigger()
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="contractModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">รายละเอียดสัญญา</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
