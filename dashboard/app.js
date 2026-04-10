@@ -558,8 +558,396 @@
   startDateInput.addEventListener('change', updateDuration);
   endDateInput.addEventListener('change', updateDuration);
 
+  // ── Email Tag Input System ──────────────────────────────────
+
+  // Collect all emails from existing contracts as "recently used"
+  function collectAllEmails() {
+    const emailSet = new Set();
+    sampleContracts.forEach(c => {
+      if (c.recipients_sale) {
+        c.recipients_sale.split(',').forEach(e => emailSet.add(e.trim().toLowerCase()));
+      }
+      if (c.recipients_eng) {
+        c.recipients_eng.split(',').forEach(e => emailSet.add(e.trim().toLowerCase()));
+      }
+    });
+
+    // Also load from localStorage
+    try {
+      const stored = JSON.parse(localStorage.getItem('pm_ma_recent_emails') || '[]');
+      stored.forEach(e => emailSet.add(e.toLowerCase()));
+    } catch (_) {}
+
+    return Array.from(emailSet).filter(e => e && e.includes('@')).sort();
+  }
+
+  function saveEmailToHistory(email) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('pm_ma_recent_emails') || '[]');
+      const lower = email.toLowerCase();
+      if (!stored.includes(lower)) {
+        stored.unshift(lower);
+        if (stored.length > 50) stored.pop();
+        localStorage.setItem('pm_ma_recent_emails', JSON.stringify(stored));
+      }
+    } catch (_) {}
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function getInitials(email) {
+    const name = email.split('@')[0];
+    if (name.length <= 2) return name.toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  // EmailTagInput class — manages one tag input container
+  class EmailTagInput {
+    constructor(containerId, tagsId, inputId, dropdownId) {
+      this.container = $(containerId);
+      this.tagsEl = $(tagsId);
+      this.input = $(inputId);
+      this.dropdown = $(dropdownId);
+      this.emails = [];
+      this.highlightIndex = -1;
+
+      this._bindEvents();
+    }
+
+    _bindEvents() {
+      // Focus input when clicking container
+      this.container.addEventListener('click', () => this.input.focus());
+
+      // Keyboard events
+      this.input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'Tab' || e.key === ',') {
+          e.preventDefault();
+          // If dropdown has a highlighted item, use that
+          if (this.highlightIndex >= 0) {
+            const items = this.dropdown.querySelectorAll('.email-dropdown-item');
+            if (items[this.highlightIndex]) {
+              this.addEmail(items[this.highlightIndex].dataset.email);
+              this._hideDropdown();
+              return;
+            }
+          }
+          this._commitInput();
+        } else if (e.key === 'Backspace' && !this.input.value) {
+          // Remove last tag
+          if (this.emails.length > 0) {
+            this.removeEmail(this.emails[this.emails.length - 1]);
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          this._navigateDropdown(1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          this._navigateDropdown(-1);
+        } else if (e.key === 'Escape') {
+          this._hideDropdown();
+        }
+      });
+
+      // Input change => show autocomplete
+      this.input.addEventListener('input', () => {
+        this._showAutocomplete();
+      });
+
+      // Focus => show dropdown if there's text
+      this.input.addEventListener('focus', () => {
+        if (this.input.value.trim()) {
+          this._showAutocomplete();
+        }
+      });
+
+      // Hide dropdown on blur (slight delay for click)
+      this.input.addEventListener('blur', () => {
+        setTimeout(() => this._hideDropdown(), 200);
+      });
+
+      // Handle paste — split by comma, semicolon, space, newline
+      this.input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        const emails = text.split(/[,;\s\n]+/).filter(s => s.trim());
+        emails.forEach(email => {
+          const trimmed = email.trim();
+          if (isValidEmail(trimmed)) {
+            this.addEmail(trimmed);
+          }
+        });
+      });
+    }
+
+    _commitInput() {
+      const val = this.input.value.replace(/,/g, '').trim();
+      if (val && isValidEmail(val)) {
+        this.addEmail(val);
+      } else if (val) {
+        // Shake animation for invalid
+        this.container.style.animation = 'none';
+        this.container.offsetHeight; // reflow
+        this.container.style.animation = '';
+        this.container.style.borderColor = 'var(--red-500)';
+        setTimeout(() => {
+          this.container.style.borderColor = '';
+        }, 800);
+      }
+    }
+
+    addEmail(email) {
+      const lower = email.toLowerCase().trim();
+      if (!lower || this.emails.includes(lower)) return;
+
+      this.emails.push(lower);
+      this.input.value = '';
+      this._renderTags();
+      this._hideDropdown();
+      saveEmailToHistory(lower);
+      renderRecentEmails(); // refresh recent chips
+    }
+
+    removeEmail(email) {
+      this.emails = this.emails.filter(e => e !== email);
+      this._renderTags();
+      renderRecentEmails();
+    }
+
+    _renderTags() {
+      this.tagsEl.innerHTML = this.emails.map(email => `
+        <span class="email-tag" data-email="${email}">
+          <span class="tag-text">${email}</span>
+          <button class="tag-remove" type="button" title="ลบ ${email}">×</button>
+        </span>
+      `).join('');
+
+      // Bind remove buttons
+      this.tagsEl.querySelectorAll('.tag-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const tagEl = btn.closest('.email-tag');
+          this.removeEmail(tagEl.dataset.email);
+        });
+      });
+
+      // Update placeholder
+      this.input.placeholder = this.emails.length > 0
+        ? 'เพิ่มอีก...'
+        : 'พิมพ์ email แล้วกด Enter';
+    }
+
+    _showAutocomplete() {
+      const query = this.input.value.trim().toLowerCase();
+      if (!query) {
+        this._hideDropdown();
+        return;
+      }
+
+      const allEmails = collectAllEmails();
+      const matches = allEmails.filter(e =>
+        e.includes(query) && !this.emails.includes(e)
+      ).slice(0, 6);
+
+      if (matches.length === 0) {
+        this._hideDropdown();
+        return;
+      }
+
+      this.highlightIndex = -1;
+      this.dropdown.innerHTML = matches.map(email => `
+        <div class="email-dropdown-item" data-email="${email}">
+          <div class="dropdown-icon">${getInitials(email)}</div>
+          <span class="dropdown-email">${email}</span>
+          <span class="dropdown-hint">เพิ่ม</span>
+        </div>
+      `).join('');
+
+      // Bind click
+      this.dropdown.querySelectorAll('.email-dropdown-item').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          this.addEmail(item.dataset.email);
+        });
+      });
+
+      this.dropdown.classList.add('show');
+    }
+
+    _hideDropdown() {
+      this.dropdown.classList.remove('show');
+      this.highlightIndex = -1;
+    }
+
+    _navigateDropdown(direction) {
+      const items = this.dropdown.querySelectorAll('.email-dropdown-item');
+      if (items.length === 0) return;
+
+      items.forEach(i => i.classList.remove('highlighted'));
+      this.highlightIndex += direction;
+
+      if (this.highlightIndex < 0) this.highlightIndex = items.length - 1;
+      if (this.highlightIndex >= items.length) this.highlightIndex = 0;
+
+      items[this.highlightIndex].classList.add('highlighted');
+      items[this.highlightIndex].scrollIntoView({ block: 'nearest' });
+    }
+
+    getEmails() {
+      return [...this.emails];
+    }
+
+    clear() {
+      this.emails = [];
+      this.input.value = '';
+      this._renderTags();
+    }
+  }
+
+  // Create tag input instances
+  const saleEmailTags = new EmailTagInput('saleTagContainer', 'saleTags', 'saleEmailInput', 'saleDropdown');
+  const engEmailTags = new EmailTagInput('engTagContainer', 'engTags', 'engEmailInput', 'engDropdown');
+
+  // ── Recently Used Emails Section ────────────────────────────
+
+  function renderRecentEmails() {
+    const chipsContainer = $('recentEmailsChips');
+    const allEmails = collectAllEmails();
+
+    // Filter out emails already in both tag inputs
+    const usedSale = saleEmailTags.getEmails();
+    const usedEng = engEmailTags.getEmails();
+    const allUsed = new Set([...usedSale, ...usedEng]);
+
+    if (allEmails.length === 0) {
+      chipsContainer.innerHTML = '<span style="font-size:0.78rem;color:var(--text-muted)">ยังไม่มี email ที่เคยใช้</span>';
+      return;
+    }
+
+    chipsContainer.innerHTML = allEmails.slice(0, 15).map(email => {
+      const isUsed = allUsed.has(email);
+      return `
+        <button class="recent-chip ${isUsed ? 'used' : ''}" data-email="${email}" type="button" title="${isUsed ? 'เพิ่มแล้ว' : 'คลิกเพื่อเพิ่ม'}">
+          <span class="chip-avatar">${getInitials(email)}</span>
+          <span>${email}</span>
+          ${isUsed ? '' : '<span class="chip-add">+</span>'}
+        </button>
+      `;
+    }).join('');
+
+    // Bind click — prompt which field to add to
+    chipsContainer.querySelectorAll('.recent-chip:not(.used)').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const email = chip.dataset.email;
+        showAddToFieldPopup(email, chip);
+      });
+    });
+  }
+
+  // Mini popup to choose Sale or Engineer when clicking a recent chip
+  function showAddToFieldPopup(email, anchorEl) {
+    // Remove existing popups
+    document.querySelectorAll('.field-picker-popup').forEach(p => p.remove());
+
+    const popup = document.createElement('div');
+    popup.className = 'field-picker-popup';
+    popup.innerHTML = `
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">เพิ่ม "${email}" ให้:</div>
+      <button class="field-picker-btn" data-target="sale" type="button">
+        📧 Email Sale
+      </button>
+      <button class="field-picker-btn" data-target="eng" type="button">
+        🔧 Email Engineer
+      </button>
+      <button class="field-picker-btn" data-target="both" type="button">
+        ✅ ทั้ง Sale + Engineer
+      </button>
+    `;
+
+    // Position popup
+    popup.style.cssText = `
+      position: absolute;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      z-index: 100;
+      min-width: 200px;
+      animation: dropIn 0.2s ease;
+    `;
+
+    // Position near the chip
+    const rect = anchorEl.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.left = rect.left + 'px';
+    popup.style.top = (rect.bottom + 6) + 'px';
+
+    document.body.appendChild(popup);
+
+    // Style buttons
+    popup.querySelectorAll('.field-picker-btn').forEach(btn => {
+      btn.style.cssText = `
+        display: block; width: 100%; text-align: left;
+        padding: 8px 10px; background: transparent; border: 1px solid var(--border-subtle);
+        border-radius: 6px; color: var(--text-primary); font-family: inherit;
+        font-size: 0.8rem; cursor: pointer; margin-bottom: 4px;
+        transition: all 0.15s ease;
+      `;
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = 'rgba(59,130,246,0.1)';
+        btn.style.borderColor = 'var(--primary-500)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.background = 'transparent';
+        btn.style.borderColor = 'var(--border-subtle)';
+      });
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        if (target === 'sale' || target === 'both') {
+          saleEmailTags.addEmail(email);
+        }
+        if (target === 'eng' || target === 'both') {
+          engEmailTags.addEmail(email);
+        }
+        popup.remove();
+        renderRecentEmails();
+      });
+    });
+
+    // Close popup when clicking outside
+    setTimeout(() => {
+      const closeHandler = (e) => {
+        if (!popup.contains(e.target)) {
+          popup.remove();
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+    }, 10);
+  }
+
+  // ── Form Submission ──────────────────────────────────────────
+
   form.addEventListener('submit', e => {
     e.preventDefault();
+
+    // Get emails from tag inputs
+    const saleEmails = saleEmailTags.getEmails();
+    const engEmails = engEmailTags.getEmails();
+
+    // Validate at least one email in each
+    if (saleEmails.length === 0) {
+      showToast('error', '❌ กรุณาเพิ่มอย่างน้อย 1 Email Sale');
+      $('saleEmailInput').focus();
+      return;
+    }
+    if (engEmails.length === 0) {
+      showToast('error', '❌ กรุณาเพิ่มอย่างน้อย 1 Email Engineer');
+      $('engEmailInput').focus();
+      return;
+    }
 
     const alertDays = [];
     if ($('alert90').checked) alertDays.push(90);
@@ -575,17 +963,21 @@
       service_type: $('serviceType').value,
       start_date: $('startDate').value,
       end_date: $('endDate').value,
-      recipients_sale: $('recipientsSale').value,
-      recipients_eng: $('recipientsEng').value,
+      recipients_sale: saleEmails.join(','),
+      recipients_eng: engEmails.join(','),
       teams_webhook: $('teamsWebhook').value,
       note: $('contractNote').value,
       status: 'active',
     };
 
     sampleContracts.push(newContract);
-    showToast('success', `✅ บันทึกสัญญา ${newContract.po_number} เรียบร้อย`);
+    showToast('success', `✅ บันทึกสัญญา ${newContract.po_number} เรียบร้อย (Sale: ${saleEmails.length} คน, Eng: ${engEmails.length} คน)`);
 
+    // Reset form
     form.reset();
+    saleEmailTags.clear();
+    engEmailTags.clear();
+    renderRecentEmails();
     renderDashboard();
     renderContractsList(currentFilter);
     navigateTo('contracts');
@@ -622,5 +1014,7 @@
   renderDashboard();
   renderContractsList();
   renderLogs();
+  renderRecentEmails();
 
 })();
+

@@ -243,8 +243,8 @@
               <input type="text" id="projectName" placeholder="ระบบ CCTV โรงพยาบาลขอนแก่น" required>
             </div>
             <div class="form-group">
-              <label for="customerName">ชื่อลูกค้า <span class="required">*</span></label>
-              <input type="text" id="customerName" placeholder="โรงพยาบาลขอนแก่น" required>
+              <label for="customerName">ชื่อลูกค้า</label>
+              <input type="text" id="customerName" placeholder="โรงพยาบาลขอนแก่น">
             </div>
             <div class="form-group">
               <label for="serviceType">ประเภทสัญญา <span class="required">*</span></label>
@@ -324,20 +324,48 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             ผู้รับแจ้งเตือน
           </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="recipientsSale">Email Sale <span class="required">*</span></label>
-              <input type="email" id="recipientsSale" placeholder="sale@company.com" required>
+
+          <!-- Email Sale -->
+          <div class="form-group" style="margin-bottom:16px">
+            <label>Email Sale <span class="required">*</span></label>
+            <div class="email-tag-input" id="saleTagContainer">
+              <div class="email-tags" id="saleTags"></div>
+              <div class="email-input-wrap">
+                <input type="text" id="saleEmailInput" class="tag-input" placeholder="พิมพ์ email แล้วกด Enter" autocomplete="off">
+                <div class="email-dropdown" id="saleDropdown"></div>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="recipientsEng">Email Engineer <span class="required">*</span></label>
-              <input type="text" id="recipientsEng" placeholder="eng1@co.com, eng2@co.com" required>
-              <span class="form-hint">คั่นด้วยเครื่องหมาย , สำหรับหลาย email</span>
+            <span class="form-hint">กด Enter, Tab, หรือ , เพื่อเพิ่ม email — เพิ่มได้หลายคน</span>
+          </div>
+
+          <!-- Email Engineer -->
+          <div class="form-group" style="margin-bottom:16px">
+            <label>Email Engineer <span class="required">*</span></label>
+            <div class="email-tag-input" id="engTagContainer">
+              <div class="email-tags" id="engTags"></div>
+              <div class="email-input-wrap">
+                <input type="text" id="engEmailInput" class="tag-input" placeholder="พิมพ์ email แล้วกด Enter" autocomplete="off">
+                <div class="email-dropdown" id="engDropdown"></div>
+              </div>
             </div>
-            <div class="form-group form-group-full">
-              <label for="teamsWebhook">Teams Webhook URL <span class="required">*</span></label>
-              <input type="url" id="teamsWebhook" placeholder="https://outlook.office.com/webhook/..." required>
+            <span class="form-hint">กด Enter, Tab, หรือ , เพื่อเพิ่ม email — เพิ่มได้หลายคน</span>
+          </div>
+
+          <!-- Recently Added Emails -->
+          <div class="recent-emails-section" id="recentEmailsSection">
+            <label class="recent-emails-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              เพิ่มจาก Email ที่เคยใช้
+            </label>
+            <div class="recent-emails-chips" id="recentEmailsChips">
+              <!-- Populated by JS -->
             </div>
+          </div>
+
+          <!-- Teams Webhook -->
+          <div class="form-group form-group-full" style="margin-top:16px">
+            <label for="teamsWebhook">Teams Webhook URL</label>
+            <input type="url" id="teamsWebhook" placeholder="https://outlook.office.com/webhook/...">
           </div>
         </div>
 
