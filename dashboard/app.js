@@ -24,6 +24,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample1',
       note: 'ดูแลกล้อง CCTV 120 ตัว',
       status: 'active',
+      line_group_id: 'C1a2b3c4d5e6f7890abcdef123456789',
+      notify_line: true,
     },
     {
       contract_id: 'WC-2026-002',
@@ -38,6 +40,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample2',
       note: '',
       status: 'active',
+      line_group_id: '',
+      notify_line: false,
     },
     {
       contract_id: 'WC-2026-003',
@@ -52,6 +56,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample3',
       note: '',
       status: 'active',
+      line_group_id: 'C9876543210abcdef1234567890abcdef',
+      notify_line: true,
     },
     {
       contract_id: 'WC-2026-004',
@@ -66,6 +72,8 @@
       teams_webhook: '',
       note: 'PM ทุก 3 เดือน',
       status: 'active',
+      line_group_id: '',
+      notify_line: false,
     },
     {
       contract_id: 'WC-2026-005',
@@ -80,6 +88,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample5',
       note: 'ดูแล AP 50 ตัว',
       status: 'active',
+      line_group_id: 'Cabcdef1234567890abcdef1234567890',
+      notify_line: true,
     },
     {
       contract_id: 'WC-2026-006',
@@ -94,6 +104,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample6',
       note: '',
       status: 'active',
+      line_group_id: '',
+      notify_line: false,
     },
     {
       contract_id: 'WC-2026-007',
@@ -108,6 +120,8 @@
       teams_webhook: '',
       note: '',
       status: 'active',
+      line_group_id: '',
+      notify_line: false,
     },
     {
       contract_id: 'WC-2025-008',
@@ -122,6 +136,8 @@
       teams_webhook: '',
       note: '',
       status: 'expired',
+      line_group_id: '',
+      notify_line: false,
     },
     {
       contract_id: 'WC-2026-009',
@@ -136,6 +152,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample9',
       note: '',
       status: 'active',
+      line_group_id: 'Cfedcba0987654321fedcba0987654321',
+      notify_line: true,
     },
     {
       contract_id: 'WC-2026-010',
@@ -150,6 +168,8 @@
       teams_webhook: 'https://outlook.office.com/webhook/sample10',
       note: '',
       status: 'active',
+      line_group_id: '',
+      notify_line: false,
     },
   ];
 
@@ -162,6 +182,9 @@
     { log_id: 'LOG-006', rule_id: 'NR-004', contract_id: 'WC-2026-001', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-02-24 08:00' },
     { log_id: 'LOG-007', rule_id: 'NR-004', contract_id: 'WC-2026-001', channel: 'teams', status: 'success', error_msg: '', sent_at: '2026-02-24 08:00' },
     { log_id: 'LOG-008', rule_id: 'NR-005', contract_id: 'WC-2026-003', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-10-02 08:00' },
+    { log_id: 'LOG-009', rule_id: 'NR-001', contract_id: 'WC-2026-001', channel: 'line', status: 'success', error_msg: '', sent_at: '2026-01-25 08:01' },
+    { log_id: 'LOG-010', rule_id: 'NR-005', contract_id: 'WC-2026-003', channel: 'line', status: 'success', error_msg: '', sent_at: '2026-10-02 08:01' },
+    { log_id: 'LOG-011', rule_id: 'NR-003', contract_id: 'WC-2026-005', channel: 'line', status: 'failed', error_msg: 'Invalid group ID', sent_at: '2026-03-13 08:01' },
   ];
 
   // ── Utility Functions ────────────────────────────────────────
@@ -331,13 +354,17 @@
     feed.innerHTML = recentLogs.map(log => {
       const contract = sampleContracts.find(c => c.contract_id === log.contract_id);
       const isEmail = log.channel === 'email';
+      const isTeams = log.channel === 'teams';
+      const isLine = log.channel === 'line';
+      const channelIcon = isEmail ? '📧' : isLine ? '💚' : '💬';
+      const channelName = isEmail ? 'Outlook Email' : isLine ? 'LINE' : 'MS Teams';
       return `
         <div class="notif-item">
           <div class="notif-icon ${log.channel}">
-            ${isEmail ? '📧' : '💬'}
+            ${channelIcon}
           </div>
           <div class="notif-content">
-            <div class="notif-title">${isEmail ? 'Outlook Email' : 'MS Teams'} — ${contract ? contract.project_name : log.contract_id}</div>
+            <div class="notif-title">${channelName} — ${contract ? contract.project_name : log.contract_id}</div>
             <div class="notif-desc">
               <span class="badge badge-${log.status === 'success' ? 'success' : 'failed'}">${log.status}</span>
               ${log.error_msg ? `<span style="color:var(--red-400);margin-left:8px">${log.error_msg}</span>` : ''}
@@ -448,7 +475,7 @@
         <td><code style="font-size:0.75rem;color:var(--text-muted)">${log.log_id}</code></td>
         <td><code style="font-size:0.75rem">${log.rule_id}</code></td>
         <td><code style="font-size:0.75rem">${log.contract_id}</code></td>
-        <td><span class="badge badge-${log.channel}">${log.channel === 'email' ? '📧 Email' : '💬 Teams'}</span></td>
+        <td><span class="badge badge-${log.channel}">${log.channel === 'email' ? '📧 Email' : log.channel === 'line' ? '💚 LINE' : '💬 Teams'}</span></td>
         <td><span class="badge badge-${log.status}">${log.status}</span></td>
         <td style="color:${log.error_msg ? 'var(--red-400)' : 'var(--text-muted)'}">${log.error_msg || '-'}</td>
         <td>${log.sent_at}</td>
@@ -516,6 +543,10 @@
       <div class="detail-row">
         <span class="detail-label">💬 Teams Webhook</span>
         <span class="detail-value" style="font-size:0.75rem;max-width:300px;word-break:break-all">${contract.teams_webhook || '-'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">💚 LINE Group</span>
+        <span class="detail-value">${contract.line_group_id ? `<span class="badge badge-line">✅ เชื่อมต่อแล้ว</span>` : '<span style="color:var(--text-muted)">— ไม่ได้ตั้งค่า</span>'}</span>
       </div>
       ${contract.note ? `
       <div class="detail-row">
@@ -937,17 +968,7 @@
     const saleEmails = saleEmailTags.getEmails();
     const engEmails = engEmailTags.getEmails();
 
-    // Validate at least one email in each
-    if (saleEmails.length === 0) {
-      showToast('error', '❌ กรุณาเพิ่มอย่างน้อย 1 Email Sale');
-      $('saleEmailInput').focus();
-      return;
-    }
-    if (engEmails.length === 0) {
-      showToast('error', '❌ กรุณาเพิ่มอย่างน้อย 1 Email Engineer');
-      $('engEmailInput').focus();
-      return;
-    }
+    // (Email requirement removed)
 
     const alertDays = [];
     if ($('alert90').checked) alertDays.push(90);
@@ -968,6 +989,8 @@
       teams_webhook: $('teamsWebhook').value,
       note: $('contractNote').value,
       status: 'active',
+      line_group_id: $('lineGroupId').value.trim(),
+      notify_line: !!$('lineGroupId').value.trim(),
     };
 
     sampleContracts.push(newContract);

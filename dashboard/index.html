@@ -327,7 +327,7 @@
 
           <!-- Email Sale -->
           <div class="form-group" style="margin-bottom:16px">
-            <label>Email Sale <span class="required">*</span></label>
+            <label>Email Sale</label>
             <div class="email-tag-input" id="saleTagContainer">
               <div class="email-tags" id="saleTags"></div>
               <div class="email-input-wrap">
@@ -340,7 +340,7 @@
 
           <!-- Email Engineer -->
           <div class="form-group" style="margin-bottom:16px">
-            <label>Email Engineer <span class="required">*</span></label>
+            <label>Email Engineer</label>
             <div class="email-tag-input" id="engTagContainer">
               <div class="email-tags" id="engTags"></div>
               <div class="email-input-wrap">
@@ -364,8 +364,15 @@
 
           <!-- Teams Webhook -->
           <div class="form-group form-group-full" style="margin-top:16px">
-            <label for="teamsWebhook">Teams Webhook URL</label>
+            <label for="teamsWebhook">💬 Teams Webhook URL</label>
             <input type="url" id="teamsWebhook" placeholder="https://outlook.office.com/webhook/...">
+          </div>
+
+          <!-- LINE Group ID -->
+          <div class="form-group form-group-full">
+            <label for="lineGroupId">💚 LINE Group ID</label>
+            <input type="text" id="lineGroupId" placeholder="Cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            <span class="form-hint">Group ID จาก LINE Messaging API Webhook — ดูวิธีหาได้ในหน้าตั้งค่า</span>
           </div>
         </div>
 
@@ -470,6 +477,22 @@
 
         <div class="card">
           <div class="card-header">
+            <h2>💚 LINE Messaging API</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Channel Access Token</label>
+              <input type="password" placeholder="••••••••••••••••" id="settingLineToken">
+            </div>
+            <div class="info-box" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.15)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span style="color:var(--emerald-400)">ไปที่ <strong>developers.line.biz</strong> → สร้าง Provider → Messaging API Channel → Issue "Channel access token (long-lived)"<br>เก็บใน Script Properties ชื่อ <code>LINE_CHANNEL_TOKEN</code></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
             <h2>⏰ Scheduler Trigger</h2>
           </div>
           <div class="card-body">
@@ -491,7 +514,7 @@
                 <input type="checkbox" id="check1"> สร้าง Google Sheets + 3 Sheets
               </label>
               <label class="checklist-item">
-                <input type="checkbox" id="check2"> สร้าง Apps Script (Code.gs, email.gs, teams.gs, utils.gs)
+                <input type="checkbox" id="check2"> สร้าง Apps Script (Code.gs, email.gs, teams.gs, line.gs, utils.gs)
               </label>
               <label class="checklist-item">
                 <input type="checkbox" id="check3"> ตั้งค่า Script Properties
@@ -501,6 +524,9 @@
               </label>
               <label class="checklist-item">
                 <input type="checkbox" id="check5"> เพิ่ม MS Teams Webhook
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" id="check5b"> สร้าง LINE Bot (Messaging API) + เพิ่ม Bot เข้ากลุ่ม
               </label>
               <label class="checklist-item">
                 <input type="checkbox" id="check6"> สร้าง AppSheet App

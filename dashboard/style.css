@@ -622,6 +622,12 @@ body {
 .days-remaining.warning { color: var(--amber-400); }
 .days-remaining.safe { color: var(--emerald-400); }
 
+.badge-line {
+  background: rgba(6, 199, 85, 0.12);
+  color: #06C755;
+  border: 1px solid rgba(6, 199, 85, 0.25);
+}
+
 /* ============================================================
    BUTTONS
    ============================================================ */
@@ -1255,6 +1261,10 @@ body {
 
 .notif-icon.teams {
   background: rgba(139, 92, 246, 0.12);
+}
+
+.notif-icon.line {
+  background: rgba(6, 199, 85, 0.12);
 }
 
 .notif-content {

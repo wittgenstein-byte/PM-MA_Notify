@@ -30,6 +30,8 @@ function checkAndSendNotifications() {
       teams_webhook:   row[9],
       note:            row[10],
       status:          row[11],
+      line_group_id:   row[12],
+      notify_line:     row[13],
     };
   }
 
@@ -58,6 +60,7 @@ function checkAndSendNotifications() {
 
     let emailSuccess = true;
     let teamsSuccess = true;
+    let lineSuccess = true;
 
     // ส่ง Email
     if (notifyEmail) {
@@ -73,8 +76,15 @@ function checkAndSendNotifications() {
                       teamsSuccess ? "success" : "failed");
     }
 
-    // Mark is_sent = TRUE ถ้าส่งสำเร็จทั้งคู่
-    if (emailSuccess && teamsSuccess) {
+    // ส่ง LINE
+    if (contract.notify_line && contract.line_group_id) {
+      lineSuccess = sendLineMessage(contract, daysLeft, alertDays);
+      logNotification(ruleId, contractId, "line",
+                      lineSuccess ? "success" : "failed");
+    }
+
+    // Mark is_sent = TRUE ถ้าส่งสำเร็จทุกช่องทาง
+    if (emailSuccess && teamsSuccess && lineSuccess) {
       rulesSheet.getRange(i + 1, 7).setValue(true);       // is_sent
       rulesSheet.getRange(i + 1, 8).setValue(new Date()); // sent_at
     }
