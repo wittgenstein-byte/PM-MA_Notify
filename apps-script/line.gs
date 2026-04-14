@@ -7,7 +7,19 @@ function sendLineMessage(contract, daysLeft, alertDays) {
     const props = PropertiesService.getScriptProperties();
     const token = props.getProperty("LINE_CHANNEL_TOKEN");
 
-    if (!token || !contract.line_group_id) return false;
+    // ตรวจสอบข้อมูลแบบละเอียด
+    if (!token) {
+      Logger.log("❌ Error: ไม่พบ LINE_CHANNEL_TOKEN ใน Script Properties (Project Settings > Script Properties)");
+      return false;
+    }
+    if (!contract) {
+      Logger.log("❌ Error: ไม่พบข้อมูลสัญญา (หา Contract ID ในหน้าแรกไม่เจอ)");
+      return false;
+    }
+    if (!contract.line_group_id) {
+      Logger.log(`❌ Error: สัญญา ID [${contract.contract_id || 'Unknown'}] ไม่ได้ระบุค่า line_group_id ไว้ใน Sheet`);
+      return false;
+    }
 
     const endDateStr = Utilities.formatDate(
       new Date(contract.end_date), "Asia/Bangkok", "dd/MM/yyyy"

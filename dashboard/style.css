@@ -953,6 +953,148 @@ body {
   border-color: var(--gray-400);
 }
 
+/* ── Custom Alert Days ─────────────────────────────── */
+
+.custom-alert-row {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-alert-row label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.custom-alert-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-alert-input {
+  width: 100px;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: all var(--transition-fast);
+}
+
+.custom-alert-input:focus {
+  outline: none;
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.custom-alert-unit {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--primary-400);
+  color: var(--primary-400);
+}
+
+.btn-outline:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.custom-alert-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 0;
+}
+
+.custom-alert-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  color: var(--amber-400);
+  font-weight: 600;
+  animation: tagPop 0.2s ease-out;
+}
+
+.custom-alert-tag .tag-remove {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red-400);
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.custom-alert-tag .tag-remove:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* ── Notification Time ─────────────────────────────── */
+
+.notification-time-row {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notification-time-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.time-input {
+  width: 140px;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.badge-info {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary-400);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
 /* ============================================================
    EMAIL TAG INPUT
    ============================================================ */
@@ -1697,4 +1839,9 @@ body {
 
 [data-theme="light"] .theme-toggle:hover {
   background: #f1f5f9;
+}
+
+[data-theme="light"] .form-group select option {
+  background: #ffffff;
+  color: #0f172a;
 }

@@ -47,16 +47,24 @@ function createNotificationRules(contractId, endDate, alertDaysArray) {
 }
 
 // ตั้ง Time-based Trigger (รันครั้งเดียวตอน setup)
-function setupDailyTrigger() {
+// hour: ชั่วโมงที่ต้องการให้ส่งแจ้งเตือน (0-23) ค่าเริ่มต้น = 8 (08:00)
+// ตัวอย่าง: setupDailyTrigger()     → รันทุกวัน 08:00
+//          setupDailyTrigger(9)    → รันทุกวัน 09:00
+//          setupDailyTrigger(17)   → รันทุกวัน 17:00
+function setupDailyTrigger(hour) {
+  if (hour === undefined || hour === null) hour = 8;
+  hour = Math.max(0, Math.min(23, Math.floor(hour)));
+
   // ลบ trigger เก่าก่อน
   ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
 
-  // สร้าง trigger ใหม่ รันทุกวัน เวลา 08:00
+  // สร้าง trigger ใหม่
   ScriptApp.newTrigger("checkAndSendNotifications")
     .timeBased()
     .everyDays(1)
-    .atHour(8)
+    .atHour(hour)
     .create();
 
-  Logger.log("✅ Daily trigger ตั้งค่าเรียบร้อย — รันทุกวัน 08:00");
+  const timeStr = String(hour).padStart(2, '0') + ':00';
+  Logger.log(`✅ Daily trigger ตั้งค่าเรียบร้อย — รันทุกวัน ${timeStr}`);
 }

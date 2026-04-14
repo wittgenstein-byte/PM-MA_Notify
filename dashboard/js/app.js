@@ -7,225 +7,8 @@
 
   // ── Sample Data ──────────────────────────────────────────────
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const sampleContracts = [
-    {
-      contract_id: 'WC-2026-001',
-      po_number: 'PO-2026-0356',
-      project_name: 'ระบบ CCTV โรงพยาบาลขอนแก่น',
-      customer_name: 'โรงพยาบาลขอนแก่น',
-      service_type: 'MA+PM',
-      start_date: '2025-01-01',
-      end_date: '2026-04-25',
-      recipients_sale: 'sale@company.com',
-      recipients_eng: 'eng1@company.com,eng2@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample1',
-      note: 'ดูแลกล้อง CCTV 120 ตัว',
-      status: 'active',
-      line_group_id: 'C1a2b3c4d5e6f7890abcdef123456789',
-      notify_line: true,
-    },
-    {
-      contract_id: 'WC-2026-002',
-      po_number: 'PO-2026-0289',
-      project_name: 'ระบบ Network มหาวิทยาลัยขอนแก่น',
-      customer_name: 'มหาวิทยาลัยขอนแก่น',
-      service_type: 'MA',
-      start_date: '2025-06-01',
-      end_date: '2026-05-15',
-      recipients_sale: 'sale2@company.com',
-      recipients_eng: 'eng3@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample2',
-      note: '',
-      status: 'active',
-      line_group_id: '',
-      notify_line: false,
-    },
-    {
-      contract_id: 'WC-2026-003',
-      po_number: 'PO-2026-0100',
-      project_name: 'ระบบ Firewall การไฟฟ้าส่วนภูมิภาค',
-      customer_name: 'การไฟฟ้าส่วนภูมิภาค (กฟภ.)',
-      service_type: 'MA+PM',
-      start_date: '2026-01-01',
-      end_date: '2026-12-31',
-      recipients_sale: 'sale@company.com',
-      recipients_eng: 'eng1@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample3',
-      note: '',
-      status: 'active',
-      line_group_id: 'C9876543210abcdef1234567890abcdef',
-      notify_line: true,
-    },
-    {
-      contract_id: 'WC-2026-004',
-      po_number: 'PO-2025-0899',
-      project_name: 'ระบบ Server ธนาคารกรุงไทย สาขาขอนแก่น',
-      customer_name: 'ธนาคารกรุงไทย',
-      service_type: 'PM',
-      start_date: '2025-01-01',
-      end_date: '2026-04-12',
-      recipients_sale: 'sale3@company.com',
-      recipients_eng: 'eng2@company.com',
-      teams_webhook: '',
-      note: 'PM ทุก 3 เดือน',
-      status: 'active',
-      line_group_id: '',
-      notify_line: false,
-    },
-    {
-      contract_id: 'WC-2026-005',
-      po_number: 'PO-2026-0501',
-      project_name: 'ระบบ Wi-Fi โรงเรียนสาธิต มข.',
-      customer_name: 'โรงเรียนสาธิต มข.',
-      service_type: 'MA',
-      start_date: '2026-01-01',
-      end_date: '2026-06-30',
-      recipients_sale: 'sale4@company.com',
-      recipients_eng: 'eng4@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample5',
-      note: 'ดูแล AP 50 ตัว',
-      status: 'active',
-      line_group_id: 'Cabcdef1234567890abcdef1234567890',
-      notify_line: true,
-    },
-    {
-      contract_id: 'WC-2026-006',
-      po_number: 'PO-2026-0620',
-      project_name: 'ระบบ UPS ศูนย์ข้อมูล กระทรวงสาธารณสุข',
-      customer_name: 'กระทรวงสาธารณสุข',
-      service_type: 'PM',
-      start_date: '2026-03-01',
-      end_date: '2027-02-28',
-      recipients_sale: 'sale@company.com',
-      recipients_eng: 'eng1@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample6',
-      note: '',
-      status: 'active',
-      line_group_id: '',
-      notify_line: false,
-    },
-    {
-      contract_id: 'WC-2026-007',
-      po_number: 'PO-2026-0710',
-      project_name: 'ระบบ Access Control โรงงาน CPF ขอนแก่น',
-      customer_name: 'CPF ขอนแก่น',
-      service_type: 'MA+PM',
-      start_date: '2026-02-01',
-      end_date: '2027-01-31',
-      recipients_sale: 'sale5@company.com',
-      recipients_eng: 'eng5@company.com',
-      teams_webhook: '',
-      note: '',
-      status: 'active',
-      line_group_id: '',
-      notify_line: false,
-    },
-    {
-      contract_id: 'WC-2025-008',
-      po_number: 'PO-2025-0200',
-      project_name: 'ระบบ PA โรงพยาบาลศรีนครินทร์',
-      customer_name: 'โรงพยาบาลศรีนครินทร์',
-      service_type: 'MA',
-      start_date: '2024-06-01',
-      end_date: '2025-05-31',
-      recipients_sale: 'sale@company.com',
-      recipients_eng: 'eng1@company.com',
-      teams_webhook: '',
-      note: '',
-      status: 'expired',
-      line_group_id: '',
-      notify_line: false,
-    },
-    {
-      contract_id: 'WC-2026-009',
-      po_number: 'PO-2026-0888',
-      project_name: 'ระบบ Digital Signage ห้าง Central ขอนแก่น',
-      customer_name: 'Central ขอนแก่น',
-      service_type: 'MA',
-      start_date: '2026-01-15',
-      end_date: '2027-01-14',
-      recipients_sale: 'sale6@company.com',
-      recipients_eng: 'eng6@company.com,eng7@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample9',
-      note: '',
-      status: 'active',
-      line_group_id: 'Cfedcba0987654321fedcba0987654321',
-      notify_line: true,
-    },
-    {
-      contract_id: 'WC-2026-010',
-      po_number: 'PO-2026-0999',
-      project_name: 'ระบบ VoIP สำนักงานจังหวัดขอนแก่น',
-      customer_name: 'สำนักงานจังหวัดขอนแก่น',
-      service_type: 'MA+PM',
-      start_date: '2026-04-01',
-      end_date: '2027-03-31',
-      recipients_sale: 'sale7@company.com',
-      recipients_eng: 'eng8@company.com',
-      teams_webhook: 'https://outlook.office.com/webhook/sample10',
-      note: '',
-      status: 'active',
-      line_group_id: '',
-      notify_line: false,
-    },
-  ];
-
-  const sampleLogs = [
-    { log_id: 'LOG-001', rule_id: 'NR-001', contract_id: 'WC-2026-001', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-01-25 08:00' },
-    { log_id: 'LOG-002', rule_id: 'NR-001', contract_id: 'WC-2026-001', channel: 'teams', status: 'success', error_msg: '', sent_at: '2026-01-25 08:00' },
-    { log_id: 'LOG-003', rule_id: 'NR-002', contract_id: 'WC-2026-002', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-02-14 08:00' },
-    { log_id: 'LOG-004', rule_id: 'NR-002', contract_id: 'WC-2026-002', channel: 'teams', status: 'failed', error_msg: 'Webhook URL invalid', sent_at: '2026-02-14 08:01' },
-    { log_id: 'LOG-005', rule_id: 'NR-003', contract_id: 'WC-2026-004', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-03-13 08:00' },
-    { log_id: 'LOG-006', rule_id: 'NR-004', contract_id: 'WC-2026-001', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-02-24 08:00' },
-    { log_id: 'LOG-007', rule_id: 'NR-004', contract_id: 'WC-2026-001', channel: 'teams', status: 'success', error_msg: '', sent_at: '2026-02-24 08:00' },
-    { log_id: 'LOG-008', rule_id: 'NR-005', contract_id: 'WC-2026-003', channel: 'email', status: 'success', error_msg: '', sent_at: '2026-10-02 08:00' },
-    { log_id: 'LOG-009', rule_id: 'NR-001', contract_id: 'WC-2026-001', channel: 'line', status: 'success', error_msg: '', sent_at: '2026-01-25 08:01' },
-    { log_id: 'LOG-010', rule_id: 'NR-005', contract_id: 'WC-2026-003', channel: 'line', status: 'success', error_msg: '', sent_at: '2026-10-02 08:01' },
-    { log_id: 'LOG-011', rule_id: 'NR-003', contract_id: 'WC-2026-005', channel: 'line', status: 'failed', error_msg: 'Invalid group ID', sent_at: '2026-03-13 08:01' },
-  ];
-
-  // ── Utility Functions ────────────────────────────────────────
-
-  function calcDaysLeft(endDateStr) {
-    const end = new Date(endDateStr);
-    end.setHours(0, 0, 0, 0);
-    return Math.ceil((end - today) / (1000 * 60 * 60 * 24));
-  }
-
-  function getStatusCategory(daysLeft, status) {
-    if (status === 'expired' || status === 'cancel') return 'expired';
-    if (daysLeft <= 0) return 'expired';
-    if (daysLeft <= 30) return 'critical';
-    if (daysLeft <= 90) return 'warning';
-    return 'safe';
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return '-';
-    const d = new Date(dateStr);
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-  }
-
-  function formatThaiDate(date) {
-    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-                    'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-    const d = new Date(date);
-    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
-  }
-
-  function generateId(prefix) {
-    return `${prefix}-${Date.now()}`;
-  }
-
   // ── DOM Cache ────────────────────────────────────────────────
 
-  const $ = id => document.getElementById(id);
   const pages = document.querySelectorAll('.page');
   const navItems = document.querySelectorAll('.nav-item');
 
@@ -582,7 +365,7 @@
     const end = endDateInput.value;
     if (start && end) {
       const diff = Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
-      $('durationText').textContent = diff > 0 ? `${diff} วัน (${Math.round(diff / 30)} เดือน)` : 'วันที่ไม่ถูกต้อง';
+      $('durationText').textContent = diff === 0 ? 'ภายในวันเดียวกัน' : diff > 0 ? `${diff} วัน (${Math.round(diff / 30)} เดือน)` : 'วันที่ไม่ถูกต้อง';
     }
   }
 
@@ -607,7 +390,7 @@
     try {
       const stored = JSON.parse(localStorage.getItem('pm_ma_recent_emails') || '[]');
       stored.forEach(e => emailSet.add(e.toLowerCase()));
-    } catch (_) {}
+    } catch (_) { }
 
     return Array.from(emailSet).filter(e => e && e.includes('@')).sort();
   }
@@ -621,7 +404,7 @@
         if (stored.length > 50) stored.pop();
         localStorage.setItem('pm_ma_recent_emails', JSON.stringify(stored));
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   function isValidEmail(email) {
@@ -959,6 +742,55 @@
     }, 10);
   }
 
+  // ── Custom Alert Days ────────────────────────────────────────
+
+  const customAlertDays = [];
+
+  function renderCustomAlertTags() {
+    const container = $('customAlertTags');
+    container.innerHTML = customAlertDays.map((days, i) => `
+      <span class="custom-alert-tag">
+        ${days} วัน
+        <button type="button" class="tag-remove" data-index="${i}" title="ลบ">×</button>
+      </span>
+    `).join('');
+
+    container.querySelectorAll('.tag-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        customAlertDays.splice(parseInt(btn.dataset.index), 1);
+        renderCustomAlertTags();
+      });
+    });
+  }
+
+  $('addCustomAlert').addEventListener('click', () => {
+    const input = $('customAlertDays');
+    const val = parseInt(input.value);
+    if (isNaN(val) || val < 0 || val > 365) {
+      showToast('error', '❌ กรุณาระบุจำนวนวันระหว่าง 0–365');
+      return;
+    }
+    // Check duplicate with preset and existing custom
+    const presetDays = [90, 60, 30, 7];
+    if (presetDays.includes(val) || customAlertDays.includes(val)) {
+      showToast('error', `⚠️ ${val} วัน มีอยู่แล้ว`);
+      return;
+    }
+    customAlertDays.push(val);
+    customAlertDays.sort((a, b) => b - a);
+    renderCustomAlertTags();
+    input.value = '';
+    showToast('success', `✅ เพิ่มแจ้งเตือนก่อน ${val} วัน`);
+  });
+
+  // Enter key in custom days input
+  $('customAlertDays').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      $('addCustomAlert').click();
+    }
+  });
+
   // ── Form Submission ──────────────────────────────────────────
 
   form.addEventListener('submit', e => {
@@ -970,11 +802,20 @@
 
     // (Email requirement removed)
 
+    // Collect all alert days (preset + custom)
     const alertDays = [];
     if ($('alert90').checked) alertDays.push(90);
     if ($('alert60').checked) alertDays.push(60);
     if ($('alert30').checked) alertDays.push(30);
     if ($('alert7').checked) alertDays.push(7);
+    if ($('alert0') && $('alert0').checked) alertDays.push(0);
+    customAlertDays.forEach(d => {
+      if (!alertDays.includes(d)) alertDays.push(d);
+    });
+    alertDays.sort((a, b) => b - a);
+
+    // Get notification time
+    const notifyTime = $('notifyTime').value || '08:00';
 
     const newContract = {
       contract_id: generateId('WC'),
@@ -991,15 +832,26 @@
       status: 'active',
       line_group_id: $('lineGroupId').value.trim(),
       notify_line: !!$('lineGroupId').value.trim(),
+      alert_days: alertDays,
+      notify_time: notifyTime,
     };
 
     sampleContracts.push(newContract);
-    showToast('success', `✅ บันทึกสัญญา ${newContract.po_number} เรียบร้อย (Sale: ${saleEmails.length} คน, Eng: ${engEmails.length} คน)`);
+
+    const channelSummary = [];
+    if (saleEmails.length > 0 || engEmails.length > 0) channelSummary.push(`📧 Email`);
+    if (newContract.teams_webhook) channelSummary.push('💬 Teams');
+    if (newContract.line_group_id) channelSummary.push('💚 LINE');
+    const channelText = channelSummary.length > 0 ? channelSummary.join(', ') : 'ไม่มีช่องทาง';
+
+    showToast('success', `✅ บันทึกสัญญา ${newContract.po_number} เรียบร้อย — แจ้งเตือน ${alertDays.join(', ')} วัน ⏰ ${notifyTime} น. (${channelText})`);
 
     // Reset form
     form.reset();
     saleEmailTags.clear();
     engEmailTags.clear();
+    customAlertDays.length = 0;
+    renderCustomAlertTags();
     renderRecentEmails();
     renderDashboard();
     renderContractsList(currentFilter);
@@ -1031,47 +883,6 @@
       toast.remove();
     }, 3200);
   }
-
-  // ── Theme Toggle ───────────────────────────────────────────────
-
-  function getSavedTheme() {
-    return localStorage.getItem('pm_ma_theme') || 'dark';
-  }
-
-  function applyTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    
-    const toggles = [$('themeToggleSidebar'), $('themeToggleMobile')].filter(Boolean);
-    toggles.forEach(btn => {
-      const sun = btn.querySelector('.sun-icon');
-      const moon = btn.querySelector('.moon-icon');
-      if (theme === 'light') {
-        if (sun) sun.style.display = 'none';
-        if (moon) moon.style.display = 'block';
-      } else {
-        if (sun) sun.style.display = 'block';
-        if (moon) moon.style.display = 'none';
-      }
-    });
-  }
-
-  function toggleTheme() {
-    const current = getSavedTheme();
-    const newTheme = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('pm_ma_theme', newTheme);
-    applyTheme(newTheme);
-  }
-
-  const toggleSidebar = $('themeToggleSidebar');
-  const toggleMobile = $('themeToggleMobile');
-  if (toggleSidebar) toggleSidebar.addEventListener('click', toggleTheme);
-  if (toggleMobile) toggleMobile.addEventListener('click', toggleTheme);
-
-  applyTheme(getSavedTheme());
 
   // ── Initialize ───────────────────────────────────────────────
 
