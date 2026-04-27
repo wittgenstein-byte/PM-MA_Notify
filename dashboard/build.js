@@ -1,6 +1,6 @@
 // ============================================================
 //  Build script — inject environment variables into static dashboard
-//  รัน: node build.js
+//  รัน: node build.js  (อยู่ใน dashboard/ เพราะ Vercel Root Directory = dashboard/)
 //  Vercel จะรัน script นี้อัตโนมัติผ่าน vercel.json buildCommand
 // ============================================================
 
@@ -22,7 +22,8 @@ window.__ENV__ = {
 };
 `;
 
-const outPath = path.join(__dirname, 'dashboard', 'config.js');
+// อยู่ใน dashboard/ แล้ว → เขียน config.js ในโฟลเดอร์เดียวกัน
+const outPath = path.join(__dirname, 'config.js');
 fs.writeFileSync(outPath, configContent, 'utf8');
 console.log(`[build] ✅ config.js generated → ${outPath}`);
-console.log(`[build]    GAS_SCRIPT_URL: ${GAS_SCRIPT_URL ? GAS_SCRIPT_URL.slice(0, 60) + '...' : '(not set)'}`);
+console.log(`[build]    GAS_SCRIPT_URL: ${GAS_SCRIPT_URL ? GAS_SCRIPT_URL.slice(0, 60) + '...' : '(not set — demo mode)'}`);
