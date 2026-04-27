@@ -41,6 +41,16 @@ function doPost(e) {
       return jsonResponse({ status: 'ok', contract_id: result.contract_id, message: 'บันทึกสัญญาเรียบร้อย' });
     }
 
+    if (action === 'updateContract') {
+      const result = updateContractInSheet(payload.contract_id, payload.data);
+      return jsonResponse({ status: 'ok', contract_id: result.contract_id, message: 'อัพเดทสัญญาเรียบร้อย' });
+    }
+
+    if (action === 'deleteContract') {
+      deleteContractFromSheet(payload.contract_id);
+      return jsonResponse({ status: 'ok', message: 'ลบสัญญาเรียบร้อย' });
+    }
+
     return jsonResponse({ status: 'error', message: 'Unknown action: ' + action }, 400);
   } catch (err) {
     return jsonResponse({ status: 'error', message: err.message }, 500);
@@ -157,3 +167,103 @@ function getLogsData() {
   }
   return logs.reverse(); // ล่าสุดขึ้นก่อน
 }
+
+// ============================================================
+//  UPDATE CONTRACT — อัพเดทข้อมูลสัญญาที่มีอยู่
+// ============================================================
+
+function updateContractInSheet(contractId, data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('warranty_contracts');
+  const rows = sheet.getDataRange().getValues();
+
+  // หาแถวที่ตรงกับ contract_id
+  let rowIndex = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === contractId) {
+      rowIndex = i + 1; // sheet row is 1-indexed + header
+      break;
+    }
+  }
+
+  if (rowIndex === -1) {
+    throw new Error('ไม่พบสัญญา: ' + contractId);
+  }
+
+  const now = new Date();
+
+  // อัพเดทแต่ละคอลัมน์ (เฉพาะที่ส่งมา)
+  // Schema: contract_id(1) | po_number(2) | project_name(3) | customer_name(4) |
+  //   service_type(5) | start_date(6) | end_date(7) | recipients_sale(8) | recipients_eng(9) |
+  //   teams_webhook(10) | note(11) | status(12) | line_group_id(13) | notify_line(14) |
+  //   created_by(15) | created_at(16) | updated_at(17)
+
+  if (data.po_number !== undefined)       sheet.getRange(rowIndex, 2).setValue(data.po_number);
+  if (data.project_name !== undefined)    sheet.getRange(rowIndex, 3).setValue(data.project_name);
+  if (data.customer_name !== undefined)   sheet.getRange(rowIndex, 4).setValue(data.customer_name);
+  if (data.service_type !== undefined)    sheet.getRange(rowIndex, 5).setValue(data.service_type);
+  if (data.start_date !== undefined)      sheet.getRange(rowIndex, 6).setValue(data.start_date);
+  if (data.end_date !== undefined)        sheet.getRange(rowIndex, 7).setValue(data.end_date);
+  if (data.recipients_sale !== undefined) sheet.getRange(rowIndex, 8).setValue(data.recipients_sale);
+  if (data.recipients_eng !== undefined)  sheet.getRange(rowIndex, 9).setValue(data.recipients_eng);
+  if (data.teams_webhook !== undefined)   sheet.getRange(rowIndex, 10).setValue(data.teams_webhook);
+  if (data.note !== undefined)            sheet.getRange(rowIndex, 11).setValue(data.note);
+  if (data.status !== undefined)          sheet.getRange(rowIndex, 12).setValue(data.status);
+  if (data.line_group_id !== undefined) {
+    sheet.getRange(rowIndex, 13).setValue(data.line_group_id);
+    sheet.getRange(rowIndex, 14).setValue(!!data.line_group_id);
+  }
+
+  // updated_at
+  sheet.getRange(rowIndex, 17).setValue(now);
+
+  // ถ้า end_date เปลี่ยน → สร้าง notification_rules ใหม่
+  if (data.end_date !== undefined && data.regenerate_rules) {
+    deleteRulesForContract(contractId);
+    const alertDays = data.alert_days && data.alert_days.length > 0
+      ? data.alert_days
+      : [90, 60, 30, 7];
+    createNotificationRules(contractId, data.end_date, alertDays);
+  }
+
+  return { contract_id: contractId };
+}
+
+// ============================================================
+//  DELETE CONTRACT — ลบสัญญา + notification_rules ที่เกี่ยวข้อง
+// ============================================================
+
+function deleteContractFromSheet(contractId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // 1) ลบ notification_rules ที่เกี่ยวข้อง
+  deleteRulesForContract(contractId);
+
+  // 2) ลบ contract row
+  const contractsSheet = ss.getSheetByName('warranty_contracts');
+  const contractRows = contractsSheet.getDataRange().getValues();
+
+  for (let i = contractRows.length - 1; i >= 1; i--) {
+    if (contractRows[i][0] === contractId) {
+      contractsSheet.deleteRow(i + 1);
+      break;
+    }
+  }
+}
+
+/**
+ * ลบ notification_rules ทั้งหมดที่เป็นของ contractId
+ */
+function deleteRulesForContract(contractId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const rulesSheet = ss.getSheetByName('notification_rules');
+  const rulesRows = rulesSheet.getDataRange().getValues();
+
+  // ลบจากล่างขึ้นบน เพื่อไม่ให้ row index เลื่อน
+  for (let i = rulesRows.length - 1; i >= 1; i--) {
+    if (rulesRows[i][1] === contractId) {
+      rulesSheet.deleteRow(i + 1);
+    }
+  }
+}
+
