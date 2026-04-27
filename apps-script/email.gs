@@ -30,9 +30,9 @@ function getAccessToken() {
 }
 
 // ─────────────────────────────────────────────────────────
-function sendOutlookEmail(contract, daysLeft, alertDays) {
+function sendOutlookEmail(contract, daysLeft, alertDays, providedToken) {
   try {
-    const token = getAccessToken();
+    const token = providedToken || getAccessToken();
     const props  = PropertiesService.getScriptProperties();
     const sender = props.getProperty("SENDER_EMAIL");
 

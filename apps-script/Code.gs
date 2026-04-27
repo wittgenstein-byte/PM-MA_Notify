@@ -35,6 +35,9 @@ function checkAndSendNotifications() {
     };
   }
 
+  // Cache access token for email to reduce redundant calls
+  let cachedEmailToken = null;
+
   // Loop notification rules
   for (let i = 1; i < rulesData.length; i++) {
     const rule = rulesData[i];
@@ -64,7 +67,11 @@ function checkAndSendNotifications() {
 
     // ส่ง Email
     if (notifyEmail) {
-      emailSuccess = sendOutlookEmail(contract, daysLeft, alertDays);
+      // Get token once per execution session
+      if (!cachedEmailToken) {
+        try { cachedEmailToken = getAccessToken(); } catch(e) { Logger.log("Email Auth Error: " + e.message); }
+      }
+      emailSuccess = sendOutlookEmail(contract, daysLeft, alertDays, cachedEmailToken);
       logNotification(ruleId, contractId, "email",
                       emailSuccess ? "success" : "failed");
     }
@@ -87,6 +94,11 @@ function checkAndSendNotifications() {
     if (emailSuccess && teamsSuccess && lineSuccess) {
       rulesSheet.getRange(i + 1, 7).setValue(true);       // is_sent
       rulesSheet.getRange(i + 1, 8).setValue(new Date()); // sent_at
+    }
+
+    // Rate Limiting: พัก 1 วินาทีถ้ามีการส่งแจ้งเตือน เพื่อป้องกันโควต้า Google เต็ม (Bandwidth/Rate limit)
+    if (notifyEmail || notifyTeams || (contract.notify_line && contract.line_group_id)) {
+      Utilities.sleep(1000); 
     }
   }
 }
