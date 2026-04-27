@@ -191,6 +191,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  overflow-y: auto;
 }
 
 .nav-item {
@@ -328,6 +329,7 @@ body {
   flex: 1;
   margin-left: var(--sidebar-width);
   min-height: 100vh;
+  min-width: 0;
 }
 
 .page {
@@ -1845,3 +1847,193 @@ body {
   background: #ffffff;
   color: #0f172a;
 }
+
+/* ============================================================
+   ACTION BUTTONS — Edit / Delete in table rows
+   ============================================================ */
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn-edit:hover {
+  border-color: var(--amber-500) !important;
+  color: var(--amber-400) !important;
+  background: rgba(245, 158, 11, 0.08) !important;
+}
+
+.btn-delete:hover {
+  border-color: var(--red-500) !important;
+  color: var(--red-400) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* ============================================================
+   DANGER BUTTON
+   ============================================================ */
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--red-500), var(--red-600));
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, var(--red-400), var(--red-500));
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   CONNECTION BADGE
+   ============================================================ */
+
+.connection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.connection-badge.demo {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--amber-400);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.connection-badge.connected {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald-400);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.conn-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.connection-badge.demo .conn-dot {
+  background: var(--amber-400);
+  box-shadow: 0 0 6px var(--amber-400);
+}
+
+.connection-badge.connected .conn-dot {
+  background: var(--emerald-400);
+  box-shadow: 0 0 6px var(--emerald-400);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================================
+   SYNC BUTTON
+   ============================================================ */
+
+.btn-sync {
+  gap: 6px;
+}
+
+.btn-sync:hover svg {
+  animation: spin-once 0.5s ease;
+}
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sync-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--text-muted);
+  border-top-color: var(--primary-400);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   EDIT BANNER
+   ============================================================ */
+
+.edit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-lg);
+  animation: slideDown 0.3s var(--ease-out);
+  flex-wrap: wrap;
+}
+
+.edit-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--amber-400);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.edit-banner-content svg {
+  flex-shrink: 0;
+}
+
+.edit-banner-cancel {
+  color: var(--text-muted) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.edit-banner-cancel:hover {
+  color: var(--red-400) !important;
+  border-color: var(--red-500) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   BADGE INFO — for notification days
+   ============================================================ */
+
+.badge-info {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-400);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+

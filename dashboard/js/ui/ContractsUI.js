@@ -8,10 +8,14 @@ class ContractsUI {
   /**
    * @param {Function} onRowClick - callback(contractId)
    * @param {Function} renderStatusBadge
+   * @param {Function} onEdit - callback(contractId)
+   * @param {Function} onDelete - callback(contractId)
    */
-  constructor(onRowClick, renderStatusBadge) {
+  constructor(onRowClick, renderStatusBadge, onEdit, onDelete) {
     this._onRowClick = onRowClick;
     this._renderStatusBadge = renderStatusBadge;
+    this._onEdit = onEdit || (() => {});
+    this._onDelete = onDelete || (() => {});
     this._currentFilter = 'all';
     this._contracts = [];
     this._bindFilterTabs();
@@ -70,16 +74,31 @@ class ContractsUI {
         <td><span class="days-remaining ${c.category}">${c.daysLeft > 0 ? c.daysLeft + ' วัน' : 'หมดอายุ'}</span></td>
         <td>${this._renderStatusBadge(c.category)}</td>
         <td>
-          <button class="btn-icon" title="ดูรายละเอียด" data-view="${c.contract_id}">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
+          <div class="action-buttons">
+            <button class="btn-icon" title="ดูรายละเอียด" data-view="${c.contract_id}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-edit" title="แก้ไข" data-edit="${c.contract_id}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-delete" title="ลบ" data-delete="${c.contract_id}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
 
+    // Bind row click (view modal)
     tbody.querySelectorAll('tr').forEach(row => {
       row.addEventListener('click', e => {
         if (e.target.closest('.btn-icon')) return;
@@ -87,8 +106,28 @@ class ContractsUI {
       });
     });
 
-    tbody.querySelectorAll('.btn-icon').forEach(btn => {
-      btn.addEventListener('click', () => this._onRowClick(btn.dataset.view));
+    // Bind view buttons
+    tbody.querySelectorAll('[data-view]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        this._onRowClick(btn.dataset.view);
+      });
+    });
+
+    // Bind edit buttons
+    tbody.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        this._onEdit(btn.dataset.edit);
+      });
+    });
+
+    // Bind delete buttons
+    tbody.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        this._onDelete(btn.dataset.delete);
+      });
     });
   }
 
