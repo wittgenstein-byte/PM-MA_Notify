@@ -6,6 +6,9 @@ function sendLineMessage(contract, daysLeft, alertDays) {
   try {
     const props = PropertiesService.getScriptProperties();
     const token = props.getProperty("LINE_CHANNEL_TOKEN");
+    
+    // ดึงค่า Default จาก Script Properties (ถ้ามี)
+    const defaultGroupId = props.getProperty("DEFAULT_LINE_GROUP_ID");
 
     // ตรวจสอบข้อมูลแบบละเอียด
     if (!token) {
@@ -13,11 +16,15 @@ function sendLineMessage(contract, daysLeft, alertDays) {
       return false;
     }
     if (!contract) {
-      Logger.log("❌ Error: ไม่พบข้อมูลสัญญา (หา Contract ID ในหน้าแรกไม่เจอ)");
+      Logger.log("❌ Error: ไม่พบข้อมูลสัญญา");
       return false;
     }
-    if (!contract.line_group_id) {
-      Logger.log(`❌ Error: สัญญา ID [${contract.contract_id || 'Unknown'}] ไม่ได้ระบุค่า line_group_id ไว้ใน Sheet`);
+
+    // ใช้ค่าจาก Sheet ถ้าไม่มีให้ใช้ค่า Default
+    const targetGroupId = contract.line_group_id || defaultGroupId;
+
+    if (!targetGroupId) {
+      Logger.log(`❌ Error: สัญญา ID [${contract.contract_id || 'Unknown'}] ไม่ได้ระบุ line_group_id และไม่มีค่า DEFAULT_LINE_GROUP_ID ใน Script Properties`);
       return false;
     }
 
@@ -34,7 +41,7 @@ function sendLineMessage(contract, daysLeft, alertDays) {
     );
 
     const payload = {
-      to: contract.line_group_id,
+      to: targetGroupId,
       messages: [
         {
           type: "flex",
