@@ -7,12 +7,17 @@
 class ModalUI {
   /**
    * @param {Function} renderStatusBadge - injected renderer function
+   * @param {Function} onEdit - callback(contractId)
+   * @param {Function} onDelete - callback(contractId)
    */
-  constructor(renderStatusBadge) {
+  constructor(renderStatusBadge, onEdit, onDelete) {
     this._renderStatusBadge = renderStatusBadge;
+    this._onEdit = onEdit || (() => {});
+    this._onDelete = onDelete || (() => {});
     this._overlay = document.getElementById('modalOverlay');
     this._title   = document.getElementById('modalTitle');
     this._body    = document.getElementById('modalBody');
+    this._currentContractId = null;
     this._bindCloseEvents();
   }
 
@@ -22,13 +27,24 @@ class ModalUI {
    */
   open(contract) {
     const { daysLeft, category } = contract;
+    this._currentContractId = contract.contract_id;
     this._title.textContent = `📄 ${contract.po_number}`;
     this._body.innerHTML = this._buildHTML(contract, daysLeft, category);
     this._overlay.classList.add('active');
+
+    // Bind action buttons inside modal
+    this._body.querySelector('[data-modal-edit]')?.addEventListener('click', () => {
+      this.close();
+      this._onEdit(contract.contract_id);
+    });
+    this._body.querySelector('[data-modal-delete]')?.addEventListener('click', () => {
+      this._onDelete(contract.contract_id);
+    });
   }
 
   close() {
     this._overlay.classList.remove('active');
+    this._currentContractId = null;
   }
 
   _bindCloseEvents() {
@@ -65,6 +81,23 @@ class ModalUI {
         ? '<span class="badge badge-line">✅ เชื่อมต่อแล้ว</span>'
         : '<span style="color:var(--text-muted)">— ไม่ได้ตั้งค่า</span>')}
       ${contract.note ? row('📝 หมายเหตุ', contract.note) : ''}
+
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-sm" data-modal-edit title="แก้ไขสัญญานี้">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          แก้ไข
+        </button>
+        <button class="btn btn-danger btn-sm" data-modal-delete title="ลบสัญญานี้">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          ลบ
+        </button>
+      </div>
     `;
   }
 }

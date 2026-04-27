@@ -1,5 +1,5 @@
 // ============================================================
-//  AddContractUI — SRP: รับผิดชอบเฉพาะ Add Contract form
+//  AddContractUI — SRP: รับผิดชอบเฉพาะ Add/Edit Contract form
 //  GRASP: Creator — สร้าง EmailTagInput instances (มี data ที่ต้องการ)
 //  DIP: รับ ContractService, ToastUI, router เป็น dependencies
 // ============================================================
@@ -23,6 +23,11 @@ class AddContractUI {
 
     this._customAlertDays = [];
     this._form = document.getElementById('contractForm');
+
+    // ── Edit mode state ──────────────────────────────────
+    this._editMode = false;
+    this._editContractId = null;
+    this._onUpdated = null; // set via setOnUpdated()
 
     // GRASP: Creator — AddContractUI เป็นผู้สร้าง EmailTagInput
     this._saleEmailTags = new EmailTagInput(
@@ -48,6 +53,133 @@ class AddContractUI {
   // ── Public ────────────────────────────────────────────────
 
   refreshRecentEmails() { this._renderRecentEmails(); }
+
+  /**
+   * Set callback for when a contract is updated (edit mode)
+   * @param {Function} callback - (contractId, updatedData) => void
+   */
+  setOnUpdated(callback) { this._onUpdated = callback; }
+
+  /**
+   * Enter edit mode: populate form with existing contract data
+   * @param {Object} contract - existing contract to edit
+   */
+  enterEditMode(contract) {
+    this._editMode = true;
+    this._editContractId = contract.contract_id;
+
+    // Update page heading
+    const heading = document.getElementById('heading-add-contract');
+    if (heading) heading.textContent = '✏️ แก้ไขสัญญา MA/PM';
+
+    // Update submit button
+    const submitBtn = this._form.querySelector('[type="submit"]');
+    if (submitBtn) {
+      submitBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+        </svg>
+        บันทึกการแก้ไข
+      `;
+    }
+
+    // Show edit info banner
+    this._showEditBanner(contract);
+
+    // Populate form fields
+    document.getElementById('poNumber').value = contract.po_number || '';
+    document.getElementById('projectName').value = contract.project_name || '';
+    document.getElementById('customerName').value = contract.customer_name || '';
+    document.getElementById('serviceType').value = contract.service_type || '';
+    document.getElementById('startDate').value = contract.start_date || '';
+    document.getElementById('endDate').value = contract.end_date || '';
+    document.getElementById('teamsWebhook').value = contract.teams_webhook || '';
+    document.getElementById('lineGroupId').value = contract.line_group_id || '';
+    document.getElementById('contractNote').value = contract.note || '';
+
+    // Populate email tags
+    this._saleEmailTags.clear();
+    this._engEmailTags.clear();
+    if (contract.recipients_sale) {
+      contract.recipients_sale.split(',').filter(e => e.trim()).forEach(e => this._saleEmailTags.addEmail(e.trim()));
+    }
+    if (contract.recipients_eng) {
+      contract.recipients_eng.split(',').filter(e => e.trim()).forEach(e => this._engEmailTags.addEmail(e.trim()));
+    }
+
+    // Trigger duration preview
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    if (startInput && endInput) {
+      startInput.dispatchEvent(new Event('change'));
+    }
+
+    this._renderRecentEmails();
+  }
+
+  /**
+   * Exit edit mode and reset form to "add new" state
+   */
+  exitEditMode() {
+    this._editMode = false;
+    this._editContractId = null;
+
+    // Restore heading
+    const heading = document.getElementById('heading-add-contract');
+    if (heading) heading.textContent = '🔔 เพิ่มสัญญา MA/PM ใหม่';
+
+    // Restore submit button
+    const submitBtn = this._form.querySelector('[type="submit"]');
+    if (submitBtn) {
+      submitBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+        </svg>
+        บันทึกสัญญา
+      `;
+    }
+
+    // Remove edit banner
+    const banner = document.getElementById('editBanner');
+    if (banner) banner.remove();
+
+    this._resetForm();
+  }
+
+  // ── Private: Edit Banner ─────────────────────────────────
+
+  _showEditBanner(contract) {
+    // Remove existing banner
+    const existing = document.getElementById('editBanner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'editBanner';
+    banner.className = 'edit-banner';
+    banner.innerHTML = `
+      <div class="edit-banner-content">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        <span>กำลังแก้ไข: <strong>${contract.po_number}</strong> — ${contract.project_name}</span>
+        <code style="font-size:0.7rem;opacity:0.7;margin-left:8px">${contract.contract_id}</code>
+      </div>
+      <button type="button" class="btn btn-sm btn-ghost edit-banner-cancel" id="btnCancelEdit">
+        ✕ ยกเลิกการแก้ไข
+      </button>
+    `;
+
+    // Insert before form
+    this._form.parentNode.insertBefore(banner, this._form);
+
+    document.getElementById('btnCancelEdit')?.addEventListener('click', () => {
+      this.exitEditMode();
+      this._navigate('contracts');
+    });
+  }
 
   // ── Private: Duration Preview ─────────────────────────────
 
@@ -201,9 +333,92 @@ class AddContractUI {
   _bindFormSubmit() {
     this._form.addEventListener('submit', async e => {
       e.preventDefault();
-      await this._handleSubmit();
+      if (this._editMode) {
+        await this._handleUpdate();
+      } else {
+        await this._handleSubmit();
+      }
     });
   }
+
+  // ── Handle UPDATE (edit mode) ─────────────────────────────
+
+  async _handleUpdate() {
+    const saleEmails = this._saleEmailTags.getEmails();
+    const engEmails  = this._engEmailTags.getEmails();
+
+    // Collect alert days
+    const alertDays = [];
+    ['alert90', 'alert60', 'alert30', 'alert7', 'alert0'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el?.checked) alertDays.push(parseInt(el.value));
+    });
+    this._customAlertDays.forEach(d => { if (!alertDays.includes(d)) alertDays.push(d); });
+    alertDays.sort((a, b) => b - a);
+
+    const updatedData = {
+      po_number:       document.getElementById('poNumber').value.trim(),
+      project_name:    document.getElementById('projectName').value.trim(),
+      customer_name:   document.getElementById('customerName').value.trim(),
+      service_type:    document.getElementById('serviceType').value,
+      start_date:      document.getElementById('startDate').value,
+      end_date:        document.getElementById('endDate').value,
+      recipients_sale: saleEmails.join(','),
+      recipients_eng:  engEmails.join(','),
+      teams_webhook:   document.getElementById('teamsWebhook').value.trim(),
+      note:            document.getElementById('contractNote').value.trim(),
+      line_group_id:   document.getElementById('lineGroupId').value.trim(),
+      alert_days:      alertDays,
+      regenerate_rules: true, // ให้ backend สร้าง rules ใหม่
+    };
+
+    const submitBtn = this._form.querySelector('[type="submit"]');
+    const originalHTML = submitBtn?.innerHTML;
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ กำลังบันทึก...'; }
+
+    try {
+      if (this._service.isDemoMode()) {
+        // Demo mode — update local only
+        this._toast.warning('⚠️ อัพเดทเฉพาะ local session (demo mode)');
+        if (this._onUpdated) {
+          this._onUpdated(this._editContractId, {
+            ...updatedData,
+            contract_id: this._editContractId,
+            status: 'active',
+            notify_line: !!updatedData.line_group_id,
+          });
+        }
+        this.exitEditMode();
+        this._navigate('contracts');
+        return;
+      }
+
+      const result = await this._service.updateContract(this._editContractId, updatedData);
+
+      if (result.status === 'ok') {
+        this._toast.success(`✅ อัพเดทสัญญา ${updatedData.po_number} เรียบร้อย`);
+        if (this._onUpdated) {
+          this._onUpdated(this._editContractId, {
+            ...updatedData,
+            contract_id: this._editContractId,
+            status: 'active',
+            notify_line: !!updatedData.line_group_id,
+          });
+        }
+        this.exitEditMode();
+        this._navigate('contracts');
+      } else {
+        this._toast.error(`❌ อัพเดทไม่สำเร็จ: ${result.message || 'ไม่ทราบสาเหตุ'}`);
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      this._toast.error(`❌ เชื่อมต่อไม่ได้: ${err.message}`);
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalHTML; }
+    }
+  }
+
+  // ── Handle CREATE (normal mode) ───────────────────────────
 
   async _handleSubmit() {
     const saleEmails = this._saleEmailTags.getEmails();
@@ -295,6 +510,11 @@ class AddContractUI {
   }
 
   _bindActionButtons() {
-    document.getElementById('btnCancel')?.addEventListener('click', () => this._navigate('dashboard'));
+    document.getElementById('btnCancel')?.addEventListener('click', () => {
+      if (this._editMode) {
+        this.exitEditMode();
+      }
+      this._navigate('dashboard');
+    });
   }
 }
