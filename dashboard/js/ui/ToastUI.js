@@ -19,7 +19,11 @@ class ToastUI {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    const icon = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '❌';
+    let icon = '❌';
+    if (type === 'success') icon = '✅';
+    else if (type === 'warning') icon = '⚠️';
+    else if (type === 'info') icon = 'ℹ️';
+    
     toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
     this._container.appendChild(toast);
 
@@ -29,4 +33,5 @@ class ToastUI {
   success(message) { this.show('success', message); }
   error(message)   { this.show('error', message); }
   warning(message) { this.show('warning', message); }
+  info(message)    { this.show('info', message); }
 }
