@@ -548,16 +548,13 @@
           <div class="card-body">
             <div class="trigger-status">
               <div class="status-dot active"></div>
-              <span>Daily Trigger — ทำงานทุกวัน</span>
+              <span>Hourly Trigger — ตรวจสอบทุกชั่วโมง</span>
             </div>
 
-            <div class="form-group" style="margin-top:16px">
-              <label for="settingTriggerHour">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                เวลาที่ส่งแจ้งเตือนทุกวัน
-              </label>
-              <input type="time" id="settingTriggerTime" value="08:00" class="time-input">
-              <span class="form-hint">ค่าเริ่มต้น 08:00 น. — สามารถเปลี่ยนได้ผ่าน Apps Script โดยรัน <code>setupDailyTrigger(ชั่วโมง)</code></span>
+            <div class="info-box" style="margin-top:16px;background:rgba(59,130,246,0.06);border-color:rgba(59,130,246,0.15)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>ระบบจะรันทุกชั่วโมง และส่งแจ้งเตือนตาม <strong>เวลาที่กำหนดในแต่ละสัญญา</strong><br>
+              ตั้งค่าเวลาได้ตอนเพิ่มหรือแก้ไขสัญญา (ค่าเริ่มต้น 08:00 น.)</span>
             </div>
 
             <div class="form-group" style="margin-top:12px">
@@ -571,7 +568,7 @@
               <span class="form-hint" style="margin-top:6px">กำหนดเพิ่มเติมได้ตอนเพิ่มสัญญาใหม่</span>
             </div>
 
-            <p class="form-hint" style="margin-top:12px">Trigger ถูกตั้งค่าผ่าน Google Apps Script<br>รัน <code>setupDailyTrigger()</code> เพื่อเปิดใช้งาน หรือ <code>setupDailyTrigger(9)</code> เพื่อตั้งเวลา 09:00</p>
+            <p class="form-hint" style="margin-top:12px">Trigger ถูกตั้งค่าผ่าน Google Apps Script<br>รัน <code>setupHourlyTrigger()</code> เพื่อเปิดใช้งาน (รันทุก 1 ชม.)<br><code>setupDailyTrigger()</code> ยังใช้ได้ แต่จะเปลี่ยนเป็น hourly อัตโนมัติ</p>
           </div>
         </div>
 
@@ -603,7 +600,7 @@
                 <input type="checkbox" id="check6"> สร้าง AppSheet App
               </label>
               <label class="checklist-item">
-                <input type="checkbox" id="check7"> รัน setupDailyTrigger()
+                <input type="checkbox" id="check7"> รัน setupHourlyTrigger()
               </label>
             </div>
           </div>

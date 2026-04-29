@@ -1,5 +1,6 @@
 // ============================================================
-//  MAIN SCHEDULER — รันทุกวัน 08:00
+//  MAIN SCHEDULER — รันทุกชั่วโมง (hourly trigger)
+//  เช็คเวลาแจ้งเตือนที่แต่ละ rule กำหนด (notify_time)
 // ============================================================
 
 function checkAndSendNotifications() {
@@ -7,8 +8,11 @@ function checkAndSendNotifications() {
   const rulesSheet = ss.getSheetByName("notification_rules");
   const contractsSheet = ss.getSheetByName("warranty_contracts");
 
-  const today = new Date();
+  const now = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
+
+  const currentHour = now.getHours();
 
   const rulesData = rulesSheet.getDataRange().getValues();
   const contractsData = contractsSheet.getDataRange().getValues();
@@ -39,6 +43,8 @@ function checkAndSendNotifications() {
   let cachedEmailToken = null;
 
   // Loop notification rules
+  // Schema: rule_id(0) | contract_id(1) | alert_days_before(2) | scheduled_date(3) |
+  //         notify_email(4) | notify_teams(5) | is_sent(6) | sent_at(7) | notify_time(8)
   for (let i = 1; i < rulesData.length; i++) {
     const rule = rulesData[i];
     const ruleId           = rule[0];
@@ -48,11 +54,26 @@ function checkAndSendNotifications() {
     const notifyEmail      = rule[4];
     const notifyTeams      = rule[5];
     const isSent           = rule[6];
+    const notifyTime       = rule[8] || '08:00'; // ค่าเริ่มต้น 08:00
 
     scheduledDate.setHours(0, 0, 0, 0);
 
-    // ข้ามถ้าส่งแล้ว หรือยังไม่ถึงวัน
-    if (isSent || scheduledDate > today) continue;
+    // ข้ามถ้าส่งแล้ว
+    if (isSent) continue;
+
+    // ข้ามถ้ายังไม่ถึงวัน
+    if (scheduledDate > today) continue;
+
+    // ────────────────────────────────────────────────────────
+    // เช็คเวลาแจ้งเตือน: ส่งเฉพาะเมื่อชั่วโมงปัจจุบัน ตรงกับ
+    // ชั่วโมงที่กำหนด (notify_time)
+    // ────────────────────────────────────────────────────────
+    const scheduledHour = parseInt(notifyTime.split(':')[0], 10) || 8;
+
+    // ถ้าวันนี้ = scheduled_date → ส่งเฉพาะเมื่อถึงชั่วโมงที่กำหนด
+    // ถ้าวันนี้เลย scheduled_date ไปแล้ว (สัญญาเก่าที่ยังไม่ได้ส่ง) → ส่งทันที
+    const isExactDay = scheduledDate.getTime() === today.getTime();
+    if (isExactDay && currentHour < scheduledHour) continue;
 
     const contract = contractMap[contractId];
     if (!contract || contract.status !== "active") continue;
@@ -96,7 +117,7 @@ function checkAndSendNotifications() {
       rulesSheet.getRange(i + 1, 8).setValue(new Date()); // sent_at
     }
 
-    // Rate Limiting: พัก 1 วินาทีถ้ามีการส่งแจ้งเตือน เพื่อป้องกันโควต้า Google เต็ม (Bandwidth/Rate limit)
+    // Rate Limiting: พัก 1 วินาทีถ้ามีการส่งแจ้งเตือน
     if (notifyEmail || notifyTeams || (contract.notify_line && contract.line_group_id)) {
       Utilities.sleep(1000); 
     }
