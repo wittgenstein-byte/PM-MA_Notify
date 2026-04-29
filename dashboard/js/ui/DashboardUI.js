@@ -83,7 +83,8 @@ class DashboardUI {
 
   _renderFeed(logs, contracts) {
     const feed = document.getElementById('notificationFeed');
-    const recentLogs = [...logs].slice(-6).reverse();
+    const sortedLogs = [...logs].sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
+    const recentLogs = sortedLogs.slice(0, 6);
 
     feed.innerHTML = recentLogs.map(log => {
       const contract = contracts.find(c => c.contract_id === log.contract_id);

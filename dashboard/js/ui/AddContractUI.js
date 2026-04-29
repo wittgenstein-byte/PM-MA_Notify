@@ -356,6 +356,8 @@ class AddContractUI {
     this._customAlertDays.forEach(d => { if (!alertDays.includes(d)) alertDays.push(d); });
     alertDays.sort((a, b) => b - a);
 
+    const notifyTime = document.getElementById('notifyTime').value || '08:00';
+
     const updatedData = {
       po_number:       document.getElementById('poNumber').value.trim(),
       project_name:    document.getElementById('projectName').value.trim(),
@@ -369,6 +371,7 @@ class AddContractUI {
       note:            document.getElementById('contractNote').value.trim(),
       line_group_id:   document.getElementById('lineGroupId').value.trim(),
       alert_days:      alertDays,
+      notify_time:     notifyTime,
       regenerate_rules: true, // ให้ backend สร้าง rules ใหม่
     };
 

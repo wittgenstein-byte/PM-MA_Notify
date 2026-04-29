@@ -105,7 +105,9 @@ function addContractToSheet(data) {
     ? data.alert_days
     : [90, 60, 30, 7];
 
-  createNotificationRules(contractId, data.end_date, alertDays);
+  // ส่ง notify_time จาก frontend (เช่น "08:00", "09:30")
+  const notifyTime = data.notify_time || '08:00';
+  createNotificationRules(contractId, data.end_date, alertDays, notifyTime);
 
   return { contract_id: contractId };
 }
@@ -217,13 +219,15 @@ function updateContractInSheet(contractId, data) {
   // updated_at
   sheet.getRange(rowIndex, 17).setValue(now);
 
-  // ถ้า end_date เปลี่ยน → สร้าง notification_rules ใหม่
-  if (data.end_date !== undefined && data.regenerate_rules) {
+  // ถ้า regenerate_rules = true → ลบ rules เก่า สร้างใหม่พร้อม notify_time
+  if (data.regenerate_rules) {
     deleteRulesForContract(contractId);
     const alertDays = data.alert_days && data.alert_days.length > 0
       ? data.alert_days
       : [90, 60, 30, 7];
-    createNotificationRules(contractId, data.end_date, alertDays);
+    const endDateForRules = data.end_date || sheet.getRange(rowIndex, 7).getValue();
+    const notifyTime = data.notify_time || '08:00';
+    createNotificationRules(contractId, endDateForRules, alertDays, notifyTime);
   }
 
   return { contract_id: contractId };

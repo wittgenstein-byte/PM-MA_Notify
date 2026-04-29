@@ -8,7 +8,8 @@ class LogsUI {
     const tbody = document.getElementById('logsTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = [...logs].reverse().map(log => `
+    const sortedLogs = [...logs].sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
+    tbody.innerHTML = sortedLogs.map(log => `
       <tr>
         <td><code style="font-size:0.75rem;color:var(--text-muted)">${log.log_id}</code></td>
         <td><code style="font-size:0.75rem">${log.rule_id}</code></td>
