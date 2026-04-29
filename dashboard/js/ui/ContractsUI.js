@@ -18,6 +18,7 @@ class ContractsUI {
     this._onDelete = onDelete || (() => {});
     this._currentFilter = 'all';
     this._contracts = [];
+    this._scheduleMap = {};
     this._bindFilterTabs();
     this._bindSearch();
   }
@@ -26,10 +27,12 @@ class ContractsUI {
    * Render ตาราง contracts
    * @param {Array} contracts - raw contract array
    * @param {string} [filter='all']
+   * @param {Object} [scheduleMap={}] - { contract_id: [{ date, time, days, is_sent }] }
    */
-  render(contracts, filter = this._currentFilter) {
+  render(contracts, filter = this._currentFilter, scheduleMap = this._scheduleMap) {
     this._contracts = contracts;
     this._currentFilter = filter;
+    this._scheduleMap = scheduleMap;
 
     const enriched = contracts.map(c => ({
       ...c,
@@ -55,7 +58,7 @@ class ContractsUI {
     if (filtered.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted)">
+          <td colspan="11" style="text-align:center;padding:40px;color:var(--text-muted)">
             ไม่พบข้อมูลสัญญา
           </td>
         </tr>`;
@@ -72,6 +75,7 @@ class ContractsUI {
         <td>${formatDate(c.start_date)}</td>
         <td>${formatDate(c.end_date)}</td>
         <td><span class="days-remaining ${c.category}">${c.daysLeft > 0 ? c.daysLeft + ' วัน' : 'หมดอายุ'}</span></td>
+        <td>${this._renderScheduleCell(c.contract_id)}</td>
         <td>${this._renderStatusBadge(c.category)}</td>
         <td>
           <div class="action-buttons">
@@ -132,6 +136,47 @@ class ContractsUI {
   }
 
   // ── Private ───────────────────────────────────────────────
+
+  /**
+   * Render notification schedule cell for a contract
+   * Shows upcoming and past notifications with badges
+   */
+  _renderScheduleCell(contractId) {
+    const schedules = this._scheduleMap[contractId];
+    if (!schedules || schedules.length === 0) {
+      return '<span style="color:var(--text-muted);font-size:0.75rem">—</span>';
+    }
+
+    const todayTime = today.getTime();
+
+    return '<div class="schedule-badges">' + schedules.map(s => {
+      const sDate = new Date(s.date);
+      const isPast = sDate.getTime() < todayTime;
+      const isToday = sDate.toISOString().split('T')[0] === today.toISOString().split('T')[0];
+
+      let cls = 'schedule-badge';
+      let icon = '';
+
+      if (s.is_sent) {
+        cls += ' sent';
+        icon = '✅';
+      } else if (isToday) {
+        cls += ' today';
+        icon = '🔔';
+      } else if (isPast) {
+        cls += ' overdue';
+        icon = '⚠️';
+      } else {
+        cls += ' pending';
+        icon = '⏳';
+      }
+
+      const dayLabel = s.days === 0 ? 'วันหมด' : `${s.days}d`;
+      const dateLabel = formatDate(s.date);
+
+      return `<span class="${cls}" title="${dateLabel} เวลา ${s.time} น. (ก่อนหมด ${s.days} วัน)">${icon} ${dayLabel} <small>${s.time}</small></span>`;
+    }).join('') + '</div>';
+  }
 
   _bindFilterTabs() {
     document.querySelectorAll('.filter-tab').forEach(tab => {

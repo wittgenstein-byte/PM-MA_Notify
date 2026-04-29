@@ -9,11 +9,13 @@ class ModalUI {
    * @param {Function} renderStatusBadge - injected renderer function
    * @param {Function} onEdit - callback(contractId)
    * @param {Function} onDelete - callback(contractId)
+   * @param {Function} getScheduleMap - () => scheduleMap
    */
-  constructor(renderStatusBadge, onEdit, onDelete) {
+  constructor(renderStatusBadge, onEdit, onDelete, getScheduleMap) {
     this._renderStatusBadge = renderStatusBadge;
     this._onEdit = onEdit || (() => {});
     this._onDelete = onDelete || (() => {});
+    this._getScheduleMap = getScheduleMap || (() => ({}));
     this._overlay = document.getElementById('modalOverlay');
     this._title   = document.getElementById('modalTitle');
     this._body    = document.getElementById('modalBody');
@@ -81,6 +83,7 @@ class ModalUI {
         ? '<span class="badge badge-line">✅ เชื่อมต่อแล้ว</span>'
         : '<span style="color:var(--text-muted)">— ไม่ได้ตั้งค่า</span>')}
       ${contract.note ? row('📝 หมายเหตุ', contract.note) : ''}
+      ${this._buildScheduleSection(contract.contract_id)}
 
       <div class="modal-actions">
         <button class="btn btn-primary btn-sm" data-modal-edit title="แก้ไขสัญญานี้">
@@ -97,6 +100,54 @@ class ModalUI {
           </svg>
           ลบ
         </button>
+      </div>
+    `;
+  }
+
+  _buildScheduleSection(contractId) {
+    const scheduleMap = this._getScheduleMap();
+    const schedules = scheduleMap[contractId];
+    if (!schedules || schedules.length === 0) return '';
+
+    const todayStr = today.toISOString().split('T')[0];
+
+    const rows = schedules.map(s => {
+      const isToday = s.date === todayStr;
+      const isPast = new Date(s.date) < today;
+      let statusHtml;
+
+      if (s.is_sent) {
+        statusHtml = '<span class="badge badge-success" style="font-size:0.7rem">✅ ส่งแล้ว</span>';
+      } else if (isToday) {
+        statusHtml = '<span class="badge badge-email" style="font-size:0.7rem">🔔 วันนี้</span>';
+      } else if (isPast) {
+        statusHtml = '<span class="badge badge-warning" style="font-size:0.7rem">⚠️ รอส่ง</span>';
+      } else {
+        statusHtml = '<span class="badge badge-expired" style="font-size:0.7rem">⏳ รอ</span>';
+      }
+
+      return `<tr>
+        <td style="padding:6px 10px;font-size:0.78rem">${formatDate(s.date)}</td>
+        <td style="padding:6px 10px;font-size:0.78rem;font-weight:600">${s.time}</td>
+        <td style="padding:6px 10px;font-size:0.78rem">${s.days === 0 ? 'วันหมดอายุ' : `ก่อน ${s.days} วัน`}</td>
+        <td style="padding:6px 10px">${statusHtml}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div style="margin-top:16px;border-top:1px solid var(--border-subtle);padding-top:16px">
+        <div style="font-weight:700;font-size:0.88rem;margin-bottom:10px">🔔 กำหนดการแจ้งเตือน</div>
+        <table style="width:100%;font-size:0.82rem;border-collapse:collapse">
+          <thead>
+            <tr style="background:rgba(15,23,42,0.3)">
+              <th style="padding:6px 10px;text-align:left;font-size:0.7rem;color:var(--text-muted);font-weight:600">วันที่</th>
+              <th style="padding:6px 10px;text-align:left;font-size:0.7rem;color:var(--text-muted);font-weight:600">เวลา</th>
+              <th style="padding:6px 10px;text-align:left;font-size:0.7rem;color:var(--text-muted);font-weight:600">ก่อนหมดอายุ</th>
+              <th style="padding:6px 10px;text-align:left;font-size:0.7rem;color:var(--text-muted);font-weight:600">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
       </div>
     `;
   }

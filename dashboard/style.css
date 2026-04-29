@@ -630,6 +630,76 @@ body {
   border: 1px solid rgba(6, 199, 85, 0.25);
 }
 
+.badge-info {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--primary-400);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* ── Schedule Badges (notification timeline) ───────────────── */
+
+.schedule-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 280px;
+}
+
+.schedule-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.4;
+  cursor: default;
+  transition: all var(--transition-fast);
+}
+
+.schedule-badge:hover {
+  transform: scale(1.05);
+}
+
+.schedule-badge small {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.schedule-badge.sent {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald-400);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  opacity: 0.65;
+}
+
+.schedule-badge.today {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--primary-400);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  animation: pulseGlow 2s infinite;
+}
+
+.schedule-badge.overdue {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--amber-400);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.schedule-badge.pending {
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--gray-400);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  50% { box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.2); }
+}
+
 /* ============================================================
    BUTTONS
    ============================================================ */
