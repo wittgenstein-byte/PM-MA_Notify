@@ -40,6 +40,19 @@ class ContractService {
     return res.json();
   }
 
+  /**
+   * ดึง notification rules ทั้งหมดจาก Google Sheets
+   * @returns {Promise<{status:string, data?:Array}>}
+   */
+  async fetchRules() {
+    if (!this._url) return { status: 'demo', data: [] };
+
+    const res = await fetch(`${this._url}?action=getRules`, {
+      redirect: 'follow',
+    });
+    return res.json();
+  }
+
   // ── CREATE ───────────────────────────────────────────────
 
   /**

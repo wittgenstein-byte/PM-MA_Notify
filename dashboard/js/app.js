@@ -10,6 +10,7 @@
   // ── Shared state ──────────────────────────────────────────
   let contracts = [...sampleContracts]; // start with sample, replace when Sheets loads
   let logs = [...sampleLogs];
+  let rules = []; // notification_rules from Sheets
 
   // ── Shared helper (used across modules) ──────────────────
   function renderStatusBadge(category) {
@@ -30,7 +31,7 @@
   // ── Instantiate UI modules ────────────────────────────────
   const router      = new Router();
   const toast       = new ToastUI('toastContainer');
-  const modal       = new ModalUI(renderStatusBadge, onEditContract, onDeleteContract);
+  const modal       = new ModalUI(renderStatusBadge, onEditContract, onDeleteContract, () => buildScheduleMap());
   const dashboardUI = new DashboardUI(openModal, renderStatusBadge);
   const contractsUI = new ContractsUI(openModal, renderStatusBadge, onEditContract, onDeleteContract);
   const logsUI      = new LogsUI();
@@ -116,10 +117,50 @@
     modal.open({ ...contract, daysLeft, category });
   }
 
+  // ── Helper: สร้าง schedule map จาก rules ──────────────────
+  function buildScheduleMap() {
+    const map = {}; // { contract_id: [{ date, time, days, is_sent }, ...] }
+
+    if (rules.length > 0) {
+      // Live mode: ใช้ rules จาก Sheets
+      rules.forEach(r => {
+        if (!map[r.contract_id]) map[r.contract_id] = [];
+        map[r.contract_id].push({
+          date: r.scheduled_date,
+          time: r.notify_time || '08:00',
+          days: r.alert_days_before,
+          is_sent: r.is_sent,
+        });
+      });
+    } else {
+      // Demo mode: คำนวณจาก end_date + default alert days
+      const defaultAlerts = [90, 60, 30, 7, 0];
+      contracts.forEach(c => {
+        if (c.status !== 'active' || !c.end_date) return;
+        const endDate = new Date(c.end_date);
+        map[c.contract_id] = defaultAlerts.map(days => {
+          const d = new Date(endDate);
+          d.setDate(d.getDate() - days);
+          const dateStr = d.toISOString().split('T')[0];
+          const isPast = d < today;
+          return { date: dateStr, time: '08:00', days, is_sent: isPast };
+        });
+      });
+    }
+
+    // Sort each contract's schedule by date
+    Object.keys(map).forEach(k => {
+      map[k].sort((a, b) => new Date(a.date) - new Date(b.date));
+    });
+
+    return map;
+  }
+
   // ── Helper: refresh ทุก view ─────────────────────────────
   function refreshAllViews() {
+    const scheduleMap = buildScheduleMap();
     dashboardUI.render(contracts, logs);
-    contractsUI.render(contracts);
+    contractsUI.render(contracts, undefined, scheduleMap);
     logsUI.render(logs);
     addContractUI.refreshRecentEmails();
     updateConnectionBadge();
@@ -153,9 +194,10 @@
     }
 
     try {
-      const [contractsResult, logsResult] = await Promise.all([
+      const [contractsResult, logsResult, rulesResult] = await Promise.all([
         contractSvc.fetchContracts(),
         contractSvc.fetchLogs(),
+        contractSvc.fetchRules(),
       ]);
 
       if (contractsResult.status === 'ok' && contractsResult.data) {
@@ -165,6 +207,10 @@
 
       if (logsResult.status === 'ok' && logsResult.data) {
         logs = logsResult.data;
+      }
+
+      if (rulesResult.status === 'ok' && rulesResult.data) {
+        rules = rulesResult.data;
       }
 
       refreshAllViews();

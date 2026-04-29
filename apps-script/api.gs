@@ -20,6 +20,10 @@ function doGet(e) {
       const data = getLogsData();
       return jsonResponse({ status: 'ok', data });
     }
+    if (action === 'getRules') {
+      const data = getRulesData();
+      return jsonResponse({ status: 'ok', data });
+    }
     // Health check
     return jsonResponse({ status: 'ok', message: 'PM-MA Notify API is running' });
   } catch (err) {
@@ -168,6 +172,35 @@ function getLogsData() {
     });
   }
   return logs.reverse(); // ล่าสุดขึ้นก่อน
+}
+
+/**
+ * ดึง notification_rules ทั้งหมด (สำหรับแสดงกำหนดแจ้งเตือนบน dashboard)
+ * Schema: rule_id(0) | contract_id(1) | alert_days_before(2) | scheduled_date(3) |
+ *         notify_email(4) | notify_teams(5) | is_sent(6) | sent_at(7) | notify_time(8)
+ */
+function getRulesData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('notification_rules');
+  const rows = sheet.getDataRange().getValues();
+
+  const rules = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row[0]) continue;
+    rules.push({
+      rule_id:           row[0],
+      contract_id:       row[1],
+      alert_days_before: row[2],
+      scheduled_date:    row[3] ? Utilities.formatDate(new Date(row[3]), 'Asia/Bangkok', 'yyyy-MM-dd') : '',
+      notify_email:      row[4],
+      notify_teams:      row[5],
+      is_sent:           row[6],
+      sent_at:           row[7] ? Utilities.formatDate(new Date(row[7]), 'Asia/Bangkok', 'yyyy-MM-dd HH:mm') : '',
+      notify_time:       row[8] || '08:00',
+    });
+  }
+  return rules;
 }
 
 // ============================================================
