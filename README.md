@@ -22,19 +22,30 @@ Google Apps Script (Scheduler → 3 ช่องทาง)
 
 ```
 PM-MA_notify/
-├── apps-script/          ← Google Apps Script (copy ไปวางใน Apps Script Editor)
-│   ├── Code.gs           ← Main Scheduler (รันทุกวัน 08:00)
-│   ├── email.gs          ← ส่ง Email ผ่าน Microsoft Graph API
-│   ├── teams.gs          ← ส่ง MS Teams ผ่าน Incoming Webhook
-│   ├── line.gs           ← ส่ง LINE ผ่าน Messaging API (Flex Message)
-│   └── utils.gs          ← Helper Functions (ID generator, logging, rules creator)
+├── apps-script/              ← Google Apps Script (copy ไปวางใน Apps Script Editor)
+│   ├── Code.gs               ← Main Scheduler (รันทุกวัน 08:00)
+│   ├── email.gs              ← ส่ง Email ผ่าน Microsoft Graph API
+│   ├── teams.gs              ← ส่ง MS Teams ผ่าน Incoming Webhook
+│   ├── line.gs               ← ส่ง LINE ผ่าน Messaging API (Flex Message)
+│   ├── utils.gs              ← Helper Functions (ID generator, logging, rules creator)
+│   ├── api.gs                ← REST API endpoints สำหรับเรียกจาก AppSheet
+│   └── test.gs               ← ฟังก์ชันทดสอบสำหรับ Debug
 │
-├── dashboard/            ← Web Dashboard Preview (เปิดดูได้เลย)
+├── dashboard/                ← Web Dashboard Preview (เปิดดูได้เลย)
 │   ├── index.html
 │   ├── style.css
-│   └── app.js
+│   ├── config.js
+│   ├── build.js
+│   ├── vercel.json
+│   └── js/
+│       ├── app.js
+│       ├── data.js
+│       ├── theme.js
+│       └── utils.js
 │
-└── README.md             ← คู่มือนี้
+├── README.md                 ← คู่มือนี้
+├── USECASE.md                ← ตัวอย่าง Use Case การใช้งาน
+└── AGENTS.md                 ← คำแนะนำสำหรับ AI Agent
 ```
 
 ## 🚀 Quick Start

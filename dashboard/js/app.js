@@ -45,6 +45,12 @@
     (page) => router.navigateTo(page)
   );
 
+  const presetUI = new PresetUI(
+    contractSvc,
+    addContractUI,
+    toast
+  );
+
   // Wire edit-mode callback
   addContractUI.setOnUpdated((contractId, updatedData) => {
     const idx = contracts.findIndex(c => c.contract_id === contractId);

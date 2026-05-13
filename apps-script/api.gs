@@ -24,6 +24,10 @@ function doGet(e) {
       const data = getRulesData();
       return jsonResponse({ status: 'ok', data });
     }
+    if (action === 'getPresets') {
+      const data = getPresetsData();
+      return jsonResponse({ status: 'ok', data });
+    }
     // Health check
     return jsonResponse({ status: 'ok', message: 'PM-MA Notify API is running' });
   } catch (err) {
@@ -38,6 +42,13 @@ function doGet(e) {
 function doPost(e) {
   try {
     const payload = JSON.parse(e.postData.contents);
+    
+    // ตรวจสอบว่าเป็น LINE Webhook หรือไม่
+    if (payload.events || payload.destination) {
+      handleLineWebhook(payload);
+      return ContentService.createTextOutput("OK");
+    }
+
     const action = payload.action;
 
     if (action === 'addContract') {
@@ -53,6 +64,21 @@ function doPost(e) {
     if (action === 'deleteContract') {
       deleteContractFromSheet(payload.contract_id);
       return jsonResponse({ status: 'ok', message: 'ลบสัญญาเรียบร้อย' });
+    }
+
+    if (action === 'addPreset') {
+      const result = addPresetToSheet(payload.data);
+      return jsonResponse({ status: 'ok', preset_id: result.preset_id, message: 'บันทึก Preset เรียบร้อย' });
+    }
+
+    if (action === 'updatePreset') {
+      const result = updatePresetInSheet(payload.preset_id, payload.data);
+      return jsonResponse({ status: 'ok', preset_id: result.preset_id, message: 'อัพเดท Preset เรียบร้อย' });
+    }
+
+    if (action === 'deletePreset') {
+      deletePresetFromSheet(payload.preset_id);
+      return jsonResponse({ status: 'ok', message: 'ลบ Preset เรียบร้อย' });
     }
 
     return jsonResponse({ status: 'error', message: 'Unknown action: ' + action }, 400);
@@ -107,7 +133,7 @@ function addContractToSheet(data) {
   // สร้าง notification_rules
   const alertDays = data.alert_days && data.alert_days.length > 0
     ? data.alert_days
-    : [90, 60, 30, 7];
+    : [30, 14, 7, 1, 0];
 
   // ส่ง notify_time จาก frontend (เช่น "08:00", "09:30")
   const notifyTime = data.notify_time || '08:00';
@@ -257,7 +283,7 @@ function updateContractInSheet(contractId, data) {
     deleteRulesForContract(contractId);
     const alertDays = data.alert_days && data.alert_days.length > 0
       ? data.alert_days
-      : [90, 60, 30, 7];
+      : [30, 14, 7, 1, 0];
     const endDateForRules = data.end_date || sheet.getRange(rowIndex, 7).getValue();
     const notifyTime = data.notify_time || '08:00';
     createNotificationRules(contractId, endDateForRules, alertDays, notifyTime);
@@ -304,3 +330,105 @@ function deleteRulesForContract(contractId) {
   }
 }
 
+// ============================================================
+//  PRESET CRUD
+// ============================================================
+
+function getPresetsData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('contract_presets');
+  if (!sheet) return [];
+  
+  const rows = sheet.getDataRange().getValues();
+  const presets = [];
+  
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row[0]) continue;
+    presets.push({
+      preset_id:       row[0],
+      preset_name:     row[1],
+      customer_name:   row[2],
+      service_type:    row[3],
+      recipients_sale: row[4],
+      recipients_eng:  row[5],
+      teams_webhook:   row[6],
+      line_group_id:   row[7],
+      alert_days:      row[8] ? row[8].toString().split(',').map(Number) : [],
+      notify_time:     row[9],
+      note:            row[10]
+    });
+  }
+  return presets;
+}
+
+function addPresetToSheet(data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('contract_presets');
+  if (!sheet) {
+    sheet = ss.insertSheet('contract_presets');
+    sheet.appendRow(['preset_id', 'preset_name', 'customer_name', 'service_type', 'recipients_sale', 'recipients_eng', 'teams_webhook', 'line_group_id', 'alert_days', 'notify_time', 'note']);
+  }
+
+  const presetId = 'PR-' + new Date().getTime();
+  
+  sheet.appendRow([
+    presetId,
+    data.preset_name || 'Unnamed Preset',
+    data.customer_name || '',
+    data.service_type || '',
+    data.recipients_sale || '',
+    data.recipients_eng || '',
+    data.teams_webhook || '',
+    data.line_group_id || '',
+    data.alert_days ? data.alert_days.join(',') : '',
+    data.notify_time || '08:00',
+    data.note || ''
+  ]);
+  
+  return { preset_id: presetId };
+}
+
+function updatePresetInSheet(presetId, data) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('contract_presets');
+  if (!sheet) throw new Error('Sheet contract_presets ไม่พบ');
+  
+  const rows = sheet.getDataRange().getValues();
+  let rowIndex = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === presetId) {
+      rowIndex = i + 1;
+      break;
+    }
+  }
+  
+  if (rowIndex === -1) throw new Error('ไม่พบ preset: ' + presetId);
+  
+  if (data.preset_name !== undefined)     sheet.getRange(rowIndex, 2).setValue(data.preset_name);
+  if (data.customer_name !== undefined)   sheet.getRange(rowIndex, 3).setValue(data.customer_name);
+  if (data.service_type !== undefined)    sheet.getRange(rowIndex, 4).setValue(data.service_type);
+  if (data.recipients_sale !== undefined) sheet.getRange(rowIndex, 5).setValue(data.recipients_sale);
+  if (data.recipients_eng !== undefined)  sheet.getRange(rowIndex, 6).setValue(data.recipients_eng);
+  if (data.teams_webhook !== undefined)   sheet.getRange(rowIndex, 7).setValue(data.teams_webhook);
+  if (data.line_group_id !== undefined)   sheet.getRange(rowIndex, 8).setValue(data.line_group_id);
+  if (data.alert_days !== undefined)      sheet.getRange(rowIndex, 9).setValue(data.alert_days.join(','));
+  if (data.notify_time !== undefined)     sheet.getRange(rowIndex, 10).setValue(data.notify_time);
+  if (data.note !== undefined)            sheet.getRange(rowIndex, 11).setValue(data.note);
+  
+  return { preset_id: presetId };
+}
+
+function deletePresetFromSheet(presetId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('contract_presets');
+  if (!sheet) return;
+  
+  const rows = sheet.getDataRange().getValues();
+  for (let i = rows.length - 1; i >= 1; i--) {
+    if (rows[i][0] === presetId) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+}
