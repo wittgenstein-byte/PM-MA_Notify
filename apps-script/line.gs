@@ -190,3 +190,74 @@ function buildLineRow(label, value) {
     ],
   };
 }
+
+// ============================================================
+//  HANDLE LINE WEBHOOK (ดึง Group ID)
+// ============================================================
+
+function handleLineWebhook(payload) {
+  if (!payload.events) return;
+  
+  payload.events.forEach(event => {
+    // สนใจเฉพาะ Event ที่มาจากกลุ่มและมี replyToken
+    if (event.source && event.source.type === "group" && event.replyToken) {
+      const groupId = event.source.groupId;
+      const replyToken = event.replyToken;
+      
+      let shouldReply = false;
+      let textMessage = "";
+      
+      // เมื่อบอทถูกเชิญเข้ากลุ่ม
+      if (event.type === "join") {
+        shouldReply = true;
+        textMessage = `สวัสดีครับ! ขอบคุณที่เชิญบอทเข้ากลุ่ม\n\n📌 Group ID ของกลุ่มนี้คือ:\n${groupId}\n\nกรุณาคัดลอก Group ID นี้ไปตั้งค่าในระบบ PM-MA Warranty Notification เพื่อรับการแจ้งเตือนครับ\n\n(หากต้องการดู Group ID อีกครั้ง พิมพ์ "getGroupId")`;
+      } 
+      // เมื่อมีคนพิมพ์ข้อความ
+      else if (event.type === "message" && event.message && event.message.type === "text") {
+        if (event.message.text.trim().toLowerCase() === "getgroupid") {
+          shouldReply = true;
+          textMessage = `📌 Group ID ของกลุ่มนี้คือ:\n${groupId}`;
+        }
+      }
+
+      if (shouldReply) {
+        replyLineMessage(replyToken, textMessage);
+      }
+    }
+  });
+}
+
+function replyLineMessage(replyToken, textMessage) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const token = props.getProperty("LINE_CHANNEL_TOKEN");
+    
+    if (!token) {
+      Logger.log("❌ Error: ไม่พบ LINE_CHANNEL_TOKEN");
+      return false;
+    }
+
+    const payload = {
+      replyToken: replyToken,
+      messages: [
+        {
+          type: "text",
+          text: textMessage
+        }
+      ]
+    };
+
+    UrlFetchApp.fetch("https://api.line.me/v2/bot/message/reply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      payload: JSON.stringify(payload),
+    });
+    return true;
+  } catch (e) {
+    Logger.log("LINE Reply Error: " + e.message);
+    return false;
+  }
+}

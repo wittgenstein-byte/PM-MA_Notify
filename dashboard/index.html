@@ -245,6 +245,17 @@
         </div>
       </div>
 
+      <div class="preset-toolbar" style="display:flex; gap:12px; margin-bottom:20px; align-items:center; background:var(--bg-secondary); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+        <label for="presetSelector" style="font-weight:600; font-size:0.9rem;">โหลด Preset:</label>
+        <select id="presetSelector" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+          <option value="">-- เลือก Preset --</option>
+        </select>
+        <button type="button" class="btn btn-outline btn-sm" id="btnManagePresets">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          จัดการ Preset
+        </button>
+      </div>
+
       <form class="contract-form" id="contractForm">
         <!-- Section: Project Info -->
         <div class="form-section">
@@ -307,36 +318,36 @@
 
           <p class="form-hint">เลือกจำนวนวันก่อนหมดอายุที่ต้องการให้แจ้งเตือน</p>
           <div class="checkbox-grid">
-            <label class="checkbox-card" for="alert90">
-              <input type="checkbox" id="alert90" value="90" checked>
-              <div class="checkbox-content">
-                <span class="checkbox-value">90</span>
-                <span class="checkbox-label">วัน</span>
-              </div>
-            </label>
-            <label class="checkbox-card" for="alert60">
-              <input type="checkbox" id="alert60" value="60" checked>
-              <div class="checkbox-content">
-                <span class="checkbox-value">60</span>
-                <span class="checkbox-label">วัน</span>
-              </div>
-            </label>
             <label class="checkbox-card" for="alert30">
-              <input type="checkbox" id="alert30" value="30" checked>
+              <input type="checkbox" id="alert30" value="30">
               <div class="checkbox-content">
                 <span class="checkbox-value">30</span>
                 <span class="checkbox-label">วัน</span>
               </div>
             </label>
+            <label class="checkbox-card" for="alert14">
+              <input type="checkbox" id="alert14" value="14">
+              <div class="checkbox-content">
+                <span class="checkbox-value">14</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
             <label class="checkbox-card" for="alert7">
-              <input type="checkbox" id="alert7" value="7" checked>
+              <input type="checkbox" id="alert7" value="7">
               <div class="checkbox-content">
                 <span class="checkbox-value">7</span>
                 <span class="checkbox-label">วัน</span>
               </div>
             </label>
+            <label class="checkbox-card" for="alert1">
+              <input type="checkbox" id="alert1" value="1">
+              <div class="checkbox-content">
+                <span class="checkbox-value">1</span>
+                <span class="checkbox-label">วัน</span>
+              </div>
+            </label>
             <label class="checkbox-card" for="alert0">
-              <input type="checkbox" id="alert0" value="0" checked>
+              <input type="checkbox" id="alert0" value="0">
               <div class="checkbox-content">
                 <span class="checkbox-value">0</span>
                 <span class="checkbox-label">วัน (ในวัน)</span>
@@ -439,12 +450,18 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="form-actions">
-          <button type="button" class="btn btn-ghost" id="btnCancel">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary btn-lg" id="btnSave">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            บันทึกสัญญา
+        <div class="form-actions" style="justify-content: space-between; align-items: center; display: flex;">
+          <button type="button" class="btn btn-outline" id="btnSavePreset">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            บันทึกเป็น Preset
           </button>
+          <div style="display:flex; gap:12px;">
+            <button type="button" class="btn btn-ghost" id="btnCancel">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary btn-lg" id="btnSave">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              บันทึกสัญญา
+            </button>
+          </div>
         </div>
       </form>
     </section>
@@ -561,10 +578,11 @@
             <div class="form-group" style="margin-top:12px">
               <label>วันแจ้งเตือนเริ่มต้น</label>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-                <span class="badge badge-info">90 วัน</span>
-                <span class="badge badge-info">60 วัน</span>
                 <span class="badge badge-info">30 วัน</span>
+                <span class="badge badge-info">14 วัน</span>
                 <span class="badge badge-info">7 วัน</span>
+                <span class="badge badge-info">1 วัน</span>
+                <span class="badge badge-info">0 วัน</span>
               </div>
               <span class="form-hint" style="margin-top:6px">กำหนดเพิ่มเติมได้ตอนเพิ่มสัญญาใหม่</span>
             </div>
@@ -580,7 +598,7 @@
           <div class="card-body">
             <div class="checklist">
               <label class="checklist-item">
-                <input type="checkbox" id="check1"> สร้าง Google Sheets + 3 Sheets
+                <input type="checkbox" id="check1"> สร้าง Google Sheets + 4 Sheets (เพิ่ม contract_presets)
               </label>
               <label class="checklist-item">
                 <input type="checkbox" id="check2"> สร้าง Apps Script (Code.gs, email.gs, teams.gs, line.gs, utils.gs)
@@ -626,6 +644,33 @@
     </div>
   </div>
 
+  <!-- Preset Modal -->
+  <div class="modal-overlay" id="presetModalOverlay">
+    <div class="modal" id="presetModal">
+      <div class="modal-header">
+        <h2>จัดการ Preset</h2>
+        <button class="modal-close" id="presetModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrapper">
+          <table class="data-table" id="presetsTable">
+            <thead>
+              <tr>
+                <th>ชื่อ Preset</th>
+                <th>ลูกค้า</th>
+                <th>ประเภท</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="presetsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="config.js"></script>
   <!-- Data & Utilities -->
   <script src="js/data.js"></script>
@@ -642,6 +687,7 @@
   <script src="js/ui/ContractsUI.js"></script>
   <script src="js/ui/LogsUI.js"></script>
   <script src="js/ui/EmailTagInput.js"></script>
+  <script src="js/ui/PresetUI.js"></script>
   <script src="js/ui/AddContractUI.js"></script>
   <!-- Bootstrap Coordinator (GRASP: Controller) -->
   <script src="js/app.js"></script>

@@ -218,7 +218,7 @@ class AddContractUI {
       this._toast.error('❌ กรุณาระบุจำนวนวันระหว่าง 0–365');
       return;
     }
-    const presetDays = [90, 60, 30, 7];
+    const presetDays = [30, 14, 7, 1, 0];
     if (presetDays.includes(val) || this._customAlertDays.includes(val)) {
       this._toast.error(`⚠️ ${val} วัน มีอยู่แล้ว`);
       return;
@@ -349,7 +349,7 @@ class AddContractUI {
 
     // Collect alert days
     const alertDays = [];
-    ['alert90', 'alert60', 'alert30', 'alert7', 'alert0'].forEach(id => {
+    ['alert30', 'alert14', 'alert7', 'alert1', 'alert0'].forEach(id => {
       const el = document.getElementById(id);
       if (el?.checked) alertDays.push(parseInt(el.value));
     });
@@ -429,7 +429,7 @@ class AddContractUI {
 
     // Collect alert days
     const alertDays = [];
-    ['alert90', 'alert60', 'alert30', 'alert7', 'alert0'].forEach(id => {
+    ['alert30', 'alert14', 'alert7', 'alert1', 'alert0'].forEach(id => {
       const el = document.getElementById(id);
       if (el?.checked) alertDays.push(parseInt(el.value));
     });
@@ -510,6 +510,67 @@ class AddContractUI {
     this._customAlertDays.length = 0;
     this._renderCustomAlertTags();
     this._renderRecentEmails();
+  }
+
+  // ── PRESET INTEGRATION ────────────────────────────────────
+
+  getFormDataForPreset() {
+    const saleEmails = this._saleEmailTags.getEmails();
+    const engEmails  = this._engEmailTags.getEmails();
+    
+    const alertDays = [];
+    ['alert30', 'alert14', 'alert7', 'alert1', 'alert0'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el?.checked) alertDays.push(parseInt(el.value));
+    });
+    this._customAlertDays.forEach(d => { if (!alertDays.includes(d)) alertDays.push(d); });
+    alertDays.sort((a, b) => b - a);
+
+    return {
+      customer_name:   document.getElementById('customerName').value.trim(),
+      service_type:    document.getElementById('serviceType').value,
+      recipients_sale: saleEmails.join(','),
+      recipients_eng:  engEmails.join(','),
+      teams_webhook:   document.getElementById('teamsWebhook').value.trim(),
+      line_group_id:   document.getElementById('lineGroupId').value.trim(),
+      alert_days:      alertDays,
+      notify_time:     document.getElementById('notifyTime').value || '08:00',
+      note:            document.getElementById('contractNote').value.trim(),
+    };
+  }
+
+  fillFormWithPreset(presetData) {
+    if (presetData.customer_name !== undefined) document.getElementById('customerName').value = presetData.customer_name;
+    if (presetData.service_type !== undefined)  document.getElementById('serviceType').value = presetData.service_type;
+    if (presetData.teams_webhook !== undefined) document.getElementById('teamsWebhook').value = presetData.teams_webhook;
+    if (presetData.line_group_id !== undefined) document.getElementById('lineGroupId').value = presetData.line_group_id;
+    if (presetData.notify_time !== undefined)   document.getElementById('notifyTime').value = presetData.notify_time;
+    if (presetData.note !== undefined)          document.getElementById('contractNote').value = presetData.note;
+
+    // Tags
+    this._saleEmailTags.clear();
+    if (presetData.recipients_sale) {
+      presetData.recipients_sale.split(',').forEach(email => {
+        if (email.trim()) this._saleEmailTags.addEmail(email.trim());
+      });
+    }
+
+    this._engEmailTags.clear();
+    if (presetData.recipients_eng) {
+      presetData.recipients_eng.split(',').forEach(email => {
+        if (email.trim()) this._engEmailTags.addEmail(email.trim());
+      });
+    }
+
+    // Alert Days
+    if (presetData.alert_days) {
+      ['alert30', 'alert14', 'alert7', 'alert1', 'alert0'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = presetData.alert_days.includes(parseInt(el.value));
+      });
+      this._customAlertDays = presetData.alert_days.filter(d => ![30, 14, 7, 1, 0].includes(d));
+      this._renderCustomAlertTags();
+    }
   }
 
   _bindActionButtons() {

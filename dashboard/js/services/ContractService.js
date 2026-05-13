@@ -120,6 +120,47 @@ class ContractService {
     return res.json();
   }
 
+  // ── PRESETS ──────────────────────────────────────────────
+
+  async fetchPresets() {
+    if (!this._url) return { status: 'demo', data: [] };
+    const res = await fetch(`${this._url}?action=getPresets`, { redirect: 'follow' });
+    return res.json();
+  }
+
+  async addPreset(presetData) {
+    if (!this._url) return { status: 'demo', message: 'No GAS URL configured' };
+    const res = await fetch(this._url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'addPreset', data: presetData }),
+      redirect: 'follow',
+    });
+    return res.json();
+  }
+
+  async updatePreset(presetId, data) {
+    if (!this._url) return { status: 'demo', message: 'No GAS URL configured' };
+    const res = await fetch(this._url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'updatePreset', preset_id: presetId, data }),
+      redirect: 'follow',
+    });
+    return res.json();
+  }
+
+  async deletePreset(presetId) {
+    if (!this._url) return { status: 'demo', message: 'No GAS URL configured' };
+    const res = await fetch(this._url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'deletePreset', preset_id: presetId }),
+      redirect: 'follow',
+    });
+    return res.json();
+  }
+
   // ── UTILITY ──────────────────────────────────────────────
 
   /**

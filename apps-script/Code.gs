@@ -54,7 +54,7 @@ function checkAndSendNotifications() {
     const notifyEmail      = rule[4];
     const notifyTeams      = rule[5];
     const isSent           = rule[6];
-    const notifyTime       = rule[8] || '08:00'; // ค่าเริ่มต้น 08:00
+    // removed notifyTime here to avoid duplicate declaration
 
     scheduledDate.setHours(0, 0, 0, 0);
 
@@ -68,8 +68,16 @@ function checkAndSendNotifications() {
     // เช็คเวลาแจ้งเตือน: ส่งเฉพาะเมื่อชั่วโมงปัจจุบัน ตรงกับ
     // ชั่วโมงที่กำหนด (notify_time)
     // ────────────────────────────────────────────────────────
-    const scheduledHour = parseInt(notifyTime.split(':')[0], 10) || 8;
-
+    let notifyTime = rule[8];
+    let scheduledHour = 8;
+    
+    if (notifyTime instanceof Date) {
+      scheduledHour = notifyTime.getHours();
+    } else if (notifyTime) {
+      // Convert to string in case it's a number or something else, then split
+      scheduledHour = parseInt(String(notifyTime).split(':')[0], 10);
+      if (isNaN(scheduledHour)) scheduledHour = 8;
+    }
     // ถ้าวันนี้ = scheduled_date → ส่งเฉพาะเมื่อถึงชั่วโมงที่กำหนด
     // ถ้าวันนี้เลย scheduled_date ไปแล้ว (สัญญาเก่าที่ยังไม่ได้ส่ง) → ส่งทันที
     const isExactDay = scheduledDate.getTime() === today.getTime();
@@ -87,7 +95,7 @@ function checkAndSendNotifications() {
     let lineSuccess = true;
 
     // ส่ง Email
-    if (notifyEmail) {
+    if (notifyEmail && (contract.recipients_sale || contract.recipients_eng)) {
       // Get token once per execution session
       if (!cachedEmailToken) {
         try { cachedEmailToken = getAccessToken(); } catch(e) { Logger.log("Email Auth Error: " + e.message); }
@@ -98,7 +106,7 @@ function checkAndSendNotifications() {
     }
 
     // ส่ง Teams
-    if (notifyTeams) {
+    if (notifyTeams && contract.teams_webhook) {
       teamsSuccess = sendTeamsMessage(contract, daysLeft, alertDays);
       logNotification(ruleId, contractId, "teams",
                       teamsSuccess ? "success" : "failed");
